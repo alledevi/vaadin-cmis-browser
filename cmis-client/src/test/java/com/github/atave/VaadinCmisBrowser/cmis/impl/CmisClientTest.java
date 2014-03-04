@@ -3,6 +3,7 @@ package com.github.atave.VaadinCmisBrowser.cmis.impl;
 import com.github.atave.VaadinCmisBrowser.cmis.api.*;
 import com.github.atave.junderscore.Lambda1;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -18,7 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Scanner;
 
 import static com.github.atave.junderscore.JUnderscore._;
@@ -240,7 +243,7 @@ public class CmisClientTest {
         String latestVersion = versionedDocument.getVersionLabel();
         client.deleteDocument(documentPath, versionedDocument.getVersionLabel());
 
-        // Check that exactly one version remains of that document
+        // Check that exactly one version of that document remains
         versionedDocument = client.getDocument(documentPath);
         assertEquals(versionedDocument.getAllVersions().size(), 1);
         assertNotEquals(versionedDocument.getVersionLabel(), latestVersion);
@@ -304,5 +307,27 @@ public class CmisClientTest {
         results = client.search(fileName, "'");
         assertEquals(results.getTotalNumItems(), 1);
         assertEquals(contents[2], asString(results.iterator().next().download()));
+
+        // Search with matchers
+        Collection<PropertyMatcher> matchers = new ArrayList<>();
+        String user = Config.get(USER);
+        Date today = new Date();
+
+        matchers.add(new PropertyMatcher(PropertyIds.CREATED_BY, QueryOperator.EQUALS, PropertyType.STRING, user));
+        matchers.add(new PropertyMatcher(PropertyIds.CREATION_DATE, QueryOperator.LESS_THAN, PropertyType.DATETIME, today));
+        matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFIED_BY, QueryOperator.EQUALS, PropertyType.STRING, user));
+        matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.LESS_THAN, PropertyType.DATETIME, today));
+
+        // Only matchers
+        results = client.search(null, null, matchers);
+        assertEquals(results.getTotalNumItems(), contents.length);
+
+        // Matchers and fileName
+        results = client.search(fileName, null, matchers);
+        assertEquals(results.getTotalNumItems(), contents.length);
+
+        // Matchers and contents
+        results = client.search(null, contents[2], matchers);
+        assertEquals(results.getTotalNumItems(), 1);
     }
 }

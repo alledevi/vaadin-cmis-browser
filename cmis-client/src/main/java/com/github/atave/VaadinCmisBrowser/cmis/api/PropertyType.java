@@ -4,6 +4,7 @@ package com.github.atave.VaadinCmisBrowser.cmis.api;
 import org.apache.chemistry.opencmis.client.api.QueryStatement;
 import org.apache.chemistry.opencmis.client.api.Session;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import static com.github.atave.VaadinCmisBrowser.cmis.api.QueryOperator.*;
@@ -56,6 +57,18 @@ public enum PropertyType {
     }
 
     /**
+     * Casts an array.
+     *
+     * @param values the array to cast
+     * @param cl     {@code T[].class}
+     * @param <T>    the type to cast to
+     * @return a casted array
+     */
+    private <T> T[] convertValues(Object[] values, Class<? extends T[]> cl) {
+        return Arrays.copyOf(values, values.length, cl);
+    }
+
+    /**
      * Formats the values of a query fragment.
      */
     String format(String fragment, Object[] values, Session session) {
@@ -65,25 +78,15 @@ public enum PropertyType {
             case STRING:
             case URI:
             case ID:
-                stmt.setString(1, (String[]) values[0]);
-                break;
-
             case STRING_SET:
             case URI_SET:
             case ID_SET:
-                for (int i = 1; i < values.length; ++i) {
-                    stmt.setString(i, (String[]) values[i]);
-                }
+                stmt.setString(1, convertValues(values, String[].class));
                 break;
 
             case NUMBER:
-                stmt.setNumber(1, (Number[]) values[0]);
-                break;
-
             case NUMBER_SET:
-                for (int i = 1; i < values.length; ++i) {
-                    stmt.setNumber(i, (Number[]) values[i]);
-                }
+                stmt.setNumber(1, convertValues(values, Number[].class));
                 break;
 
             case BOOLEAN:
@@ -91,13 +94,8 @@ public enum PropertyType {
                 break;
 
             case DATETIME:
-                stmt.setDateTime(1, (Date[]) values[0]);
-                break;
-
             case DATETIME_SET:
-                for (int i = 1; i < values.length; ++i) {
-                    stmt.setDateTime(i, (Date[]) values[i]);
-                }
+                stmt.setDateTimeTimestamp(1, convertValues(values, Date[].class));
                 break;
         }
 
