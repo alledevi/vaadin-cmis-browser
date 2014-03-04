@@ -38,18 +38,13 @@ $ mvn jetty:run
 
 1. Test it
 
-1. Commit your changes to your personal branch or to a topic branch
+1. Commit and push your changes to a remote branch
 
-1. When you feel like it, [open a Pull Request](https://help.github.com/articles/using-pull-requests)
+1. [Open a Pull Request](https://help.github.com/articles/using-pull-requests)
 
-1. Wait for me to merge those changes into *master*
+1. Wait for me to review and merge those changes into *master*
 
-1. When you can, merge those changes back
-```sh
-$ git checkout master
-$ git fetch upstream/master
-$ git merge upstream/master
-```
+1. Merge those changes back
 
 ## CmisClient API Tutorial
 
