@@ -28,7 +28,7 @@ public enum QueryOperator {
 
     private String getTemplate() {
         if (this == CONTAINS) {
-            return value + "(?)";
+            return value + " (?)";
         } else if (this == ANY_IN) {
             return "ANY ? IN (?)";
         } else if (this == IN || this == NOT_IN) {
@@ -58,7 +58,7 @@ public enum QueryOperator {
             stmt.setStringContains(1, (String) matcher.getValues()[0]);
             return stmt.toQueryString();
         } else {
-            stmt.setProperty(1, matcher.getPropertyType(), matcher.getProperty());
+            stmt.setProperty(1, matcher.getObjectType(), matcher.getProperty());
 
             if (this == LIKE || this == NOT_LIKE) {
                 // Also obvious
@@ -66,7 +66,7 @@ public enum QueryOperator {
                 return stmt.toQueryString();
             } else {
                 // Delegate
-                return matcher.getValueType().format(
+                return matcher.getPropertyType().format(
                         stmt.toQueryString(),
                         matcher.getValues(),
                         session);

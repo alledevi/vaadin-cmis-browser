@@ -11,46 +11,46 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
  */
 public class PropertyMatcher {
 
-    private final String propertyType;
+    private final String objectType;
     private final String property;
     private final QueryOperator operator;
-    private final PropertyType valueType;
+    private final PropertyType propertyType;
     private final Object[] values;
 
     /**
-     * Creates a new bundle.
+     * Creates a new {@code PropertyMatcher}.
      *
-     * @param propertyType the type of the property
+     * @param objectType   the type of the object to match
      * @param property     the name of the property
      * @param operator     an operator supported by the type of the property
-     * @param valueType    the type of the property
+     * @param propertyType the type of the property
      * @param values       the value(s) of the property
      */
-    public PropertyMatcher(String propertyType, String property, QueryOperator operator, PropertyType valueType, Object... values) {
+    public PropertyMatcher(String objectType, String property, QueryOperator operator, PropertyType propertyType, Object... values) {
         this.property = property;
         this.operator = operator;
-        this.valueType = valueType;
-        this.values = values;
         this.propertyType = propertyType;
+        this.values = values;
+        this.objectType = objectType;
     }
 
     /**
-     * Creates a new bundle for matching documents.
+     * Creates a new {@code PropertyMatcher} for matching documents.
      *
-     * @param property  the name of the property
-     * @param operator  an operator supported by the type of the property
-     * @param valueType the type of the property
-     * @param values    the value(s) of the property
+     * @param property     the name of the property
+     * @param operator     an operator supported by the type of the property
+     * @param propertyType the type of the property
+     * @param values       the value(s) of the property
      */
-    public PropertyMatcher(String property, QueryOperator operator, PropertyType valueType, Object... values) {
-        this(BaseTypeId.CMIS_DOCUMENT.value(), property, operator, valueType, values);
+    public PropertyMatcher(String property, QueryOperator operator, PropertyType propertyType, Object... values) {
+        this(BaseTypeId.CMIS_DOCUMENT.value(), property, operator, propertyType, values);
     }
 
     /**
      * Returns the type of the property.
      */
-    public String getPropertyType() {
-        return propertyType;
+    public String getObjectType() {
+        return objectType;
     }
 
     /**
@@ -70,8 +70,8 @@ public class PropertyMatcher {
     /**
      * Returns the type of the property.
      */
-    public PropertyType getValueType() {
-        return valueType;
+    public PropertyType getPropertyType() {
+        return propertyType;
     }
 
     /**
@@ -82,7 +82,7 @@ public class PropertyMatcher {
     }
 
     /**
-     * Translates this bundle in a WHERE clause.
+     * Translates this {@code PropertyMatcher} in a WHERE clause.
      *
      * @param session the session to use
      * @return a WHERE clause as a {@code String}

@@ -114,10 +114,10 @@ public class QueryBuilder {
         return this;
     }
 
-    private void concatenate(StringBuilder sb, Set<String> strings, String separator) {
-        int i = strings.size();
-        for (String selectFragment : strings) {
-            sb.append(" ").append(selectFragment);
+    private void concatenate(StringBuilder sb, Set<String> fragments, String separator) {
+        int i = fragments.size();
+        for (String fragment : fragments) {
+            sb.append(" ").append(fragment);
             if (--i > 0) {
                 sb.append(separator);
             }
