@@ -27,7 +27,7 @@ public abstract class DocumentUploader implements Upload.Receiver, Upload.Succee
     private String fileName;
     private VersioningState versioningState;
     private String checkInComment;
-    private final Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<>();
 
     private DocumentView documentView;
 
