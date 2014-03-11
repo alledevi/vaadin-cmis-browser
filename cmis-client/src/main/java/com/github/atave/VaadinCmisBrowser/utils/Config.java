@@ -1,4 +1,4 @@
-package com.github.atave.VaadinCmisBrowser.cmis.api;
+package com.github.atave.VaadinCmisBrowser.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

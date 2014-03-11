@@ -1,6 +1,6 @@
 package com.github.atave.VaadinCmisBrowser.cmis.impl;
 
-import com.github.atave.VaadinCmisBrowser.cmis.api.Config;
+import com.github.atave.VaadinCmisBrowser.utils.Config;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.RepositoryView;
 import org.junit.Test;

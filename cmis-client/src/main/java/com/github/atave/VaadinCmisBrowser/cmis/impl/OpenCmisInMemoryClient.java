@@ -1,6 +1,6 @@
 package com.github.atave.VaadinCmisBrowser.cmis.impl;
 
-import com.github.atave.VaadinCmisBrowser.cmis.api.Config;
+import com.github.atave.VaadinCmisBrowser.utils.Config;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 
