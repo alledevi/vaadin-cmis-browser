@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
+import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.OpenCmisInMemoryClient;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -40,17 +41,29 @@ import javax.servlet.annotation.WebServlet;
 
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 
+
+	
 @Theme("dashboard")
 @SuppressWarnings("serial")
 public class AppUI extends UI {
 
-	private CmisClient client;
-
-	public CmisClient getClient() {
+//	private CmisClient client;
+	private String user1;
+	private AlfrescoClient client;
+	
+//	public CmisClient getClient() {
+//		return client;
+//	}
+//
+//	public void setClient(CmisClient client) {
+//		this.client = client;
+//	}
+	
+	public AlfrescoClient getClient() {
 		return client;
 	}
 
-	public void setClient(CmisClient client) {
+	public void setClient(AlfrescoClient client) {
 		this.client = client;
 	}
 
@@ -157,28 +170,29 @@ public class AppUI extends UI {
 		signin.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-				try {
-					String user1 = username.getValue();
+//				try {
+					user1 = username.getValue();
 					String password1= password.getValue();
-					client = new OpenCmisInMemoryClient(user1, password1);
+//					client = new OpenCmisInMemoryClient(user1, password1);
+					client = new AlfrescoClient(user1, password1);
 					buildMainView(client);
-				} catch(CmisBaseException e) {
-					if (loginPanel.getComponentCount() > 2) {
-						// Remove the previous error message
-						loginPanel.removeComponent(loginPanel.getComponent(2));
-					}
-					// Add new error message
-					Label error = new Label(
-							"Wrong username or password. <span>Hint: try empty values</span>",
-							ContentMode.HTML);
-					error.addStyleName("error");
-					error.setSizeUndefined();
-					error.addStyleName("light");
-					// Add animation
-					error.addStyleName("v-animate-reveal");
-					loginPanel.addComponent(error);
-					username.focus();
-				}
+//				} catch(CmisBaseException e) {
+//					if (loginPanel.getComponentCount() > 2) {
+//						// Remove the previous error message
+//						loginPanel.removeComponent(loginPanel.getComponent(2));
+//					}
+//					// Add new error message
+//					Label error = new Label(
+//							"Wrong username or password. <span>Hint: try empty values</span>",
+//							ContentMode.HTML);
+//					error.addStyleName("error");
+//					error.setSizeUndefined();
+//					error.addStyleName("light");
+//					// Add animation
+//					error.addStyleName("v-animate-reveal");
+//					loginPanel.addComponent(error);
+//					username.focus();
+//				}
 
 			}
 		});
@@ -255,7 +269,7 @@ public class AppUI extends UI {
 										new ThemeResource("img/profile-pic.png"));
 								profilePic.setWidth("34px");
 								addComponent(profilePic);
-								Label userName = new Label("Mario Rossi");
+								Label userName = new Label(user1);
 								userName.setSizeUndefined();
 								addComponent(userName);
 

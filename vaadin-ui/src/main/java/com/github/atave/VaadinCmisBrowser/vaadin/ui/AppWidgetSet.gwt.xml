@@ -30,4 +30,8 @@
     -->
     <!-- <set-configuration-property name="devModeRedirectEnabled" value="true" /> -->
 
+
+    <inherits name="com.lexaden.breadcrumb.gwt.BreadcrumbWidgetset" />
+
+    
 </module>

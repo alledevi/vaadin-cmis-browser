@@ -26,17 +26,19 @@ import com.vaadin.ui.VerticalLayout;
 public class DownloadDocumentComponent extends CustomComponent {
 
 
-	public DownloadDocumentComponent(String documentId) {
+	public DownloadDocumentComponent(String documentId, Integer itemId , final Table table) {
 		// A layout structure used for composition
 		Panel panel = new Panel();
+		//which rows it refers to 
+		panel.setData(itemId);
 		VerticalLayout layout = new VerticalLayout();
 		panel.setContent(layout);
 
 		//button for download document
 		Image documentDownload = new Image(null, new ThemeResource(
 				"img/document-download.png"));
-		documentDownload.setHeight("64px");
-		documentDownload.setWidth("64px");
+		documentDownload.setHeight("34px");
+		documentDownload.setWidth("34px");
 		ClickListener documentDownloadListener = new ClickListener() {
 			@Override
 			public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
@@ -46,9 +48,16 @@ public class DownloadDocumentComponent extends CustomComponent {
 		};
 		documentDownload.addClickListener(documentDownloadListener);
 
+		ClickListener panelListener = new ClickListener() {
+		//select table row
+		public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
+			Integer id = (Integer)((Panel) event.getComponent()).getData();
+			table.select(id);
+		}
+	};
+		panel.addClickListener(panelListener);
 		layout.addComponent(documentDownload);
 		layout.setComponentAlignment(documentDownload, Alignment.MIDDLE_CENTER);
-
 		setCompositionRoot(panel);
 
 	}

@@ -12,6 +12,7 @@ import java.util.Map;
 import com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
+import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.ItemClickEvent;
@@ -44,6 +45,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 
 public class UploadView  extends VerticalLayout implements View  {
+//	AlfrescoClient client;
 	CmisClient client;
 
 	public UploadView() {

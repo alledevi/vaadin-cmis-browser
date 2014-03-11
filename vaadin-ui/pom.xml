@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -82,15 +81,27 @@
             For widgetset compilation, vaadin-client-compiler is automatically added on the
             compilation classpath by vaadin-maven-plugin so normally there is no need for an
             explicit dependency.
-        -->
-        <!--
-            <dependency>
+       
+        
+       	<dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client-compiler</artifactId>
             <version>${vaadin.version}</version>
             <scope>provided</scope>
-            </dependency>
-        -->
+        </dependency>
+
+        <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/smartgwt-skins.jar</systemPath>
+         -->
+                  
+      	<dependency>
+     		<groupId>com.lexaden.components</groupId>
+   			<artifactId>breadcrumb</artifactId>
+   			<version>1.7.3</version>
+     		<scope>system</scope>
+     		<systemPath>${project.basedir}/target/vaadin-ui-1.0-SNAPSHOT/WEB-INF/lib/breadcrumb-1.7.3.jar</systemPath>
+ 		</dependency>  
+
+		
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client</artifactId>
