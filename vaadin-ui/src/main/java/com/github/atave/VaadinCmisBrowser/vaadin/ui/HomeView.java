@@ -1,23 +1,11 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.apache.chemistry.opencmis.commons.enums.VersioningState;
-
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
-import com.github.atave.VaadinCmisBrowser.vaadin.utils.DocumentDownloader;
 import com.github.atave.VaadinCmisBrowser.vaadin.utils.DocumentUploader;
-import com.google.gwt.user.client.ui.RadioButton;
-import com.lexaden.breadcrumb.Breadcrumb;
-import com.lexaden.breadcrumb.BreadcrumbLayout;
-import com.vaadin.client.metadata.AsyncBundleLoader.State;
 import com.vaadin.data.Container.Filterable;
-import com.vaadin.data.Container.Viewer;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.filter.SimpleStringFilter;
@@ -29,31 +17,16 @@ import com.vaadin.event.MouseEvents;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Sizeable;
-import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Link;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.StartedEvent;
-import com.vaadin.ui.Upload.SucceededEvent;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 @SuppressWarnings("deprecation")
@@ -243,8 +216,9 @@ public class HomeView  extends VerticalLayout implements View  {
 			//!!!!!! very important
 			upload.setImmediate(false);
 			upload.setButtonCaption("Upload File");
-			//upload.addSucceededListener(receiver);
-			verticalLayout.addComponent(upload);
+			upload.addSucceededListener(receiver);
+
+            verticalLayout.addComponent(upload);
 			verticalLayout.setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
 			verticalLayout.addComponent(new Label());	
 
@@ -277,22 +251,12 @@ public class HomeView  extends VerticalLayout implements View  {
 				private static final long serialVersionUID = 1L;
 
 				public void uploadStarted(final StartedEvent event) {
-				
-					System.out.println("start");
-					System.out.println(event.getFilename());
-
-					if(table.checkOutVersion(event.getFilename()).equals("1.0")){
-						// Ã¨ il primo documento con quel nome
-						System.out.println("1.0");
-					} else {
-						System.out.println("other");
-//						receiver.setFileName(event.getFilename()+"-01");
-						receiver.setVersioningState(VersioningState.MAJOR);
-						System.out.println("end");
+                    if(client.exists(path, event.getFilename())){
+                        receiver.setVersioningState(VersioningState.MAJOR);
 					}
 					pi.setValue(0f);
 					pi.setVisible(true);
-					pi.setPollingInterval(500); // hit server frequantly to get
+					pi.setPollingInterval(500); // hit server frequently to get
 					textualProgress.setVisible(true);
 					// updates to client
 					state.setValue("Uploading");
@@ -306,22 +270,12 @@ public class HomeView  extends VerticalLayout implements View  {
 
 				public void updateProgress(long readBytes, long contentLength) {
 					// this method gets called several times during the update
-					pi.setValue(new Float(readBytes / (float) contentLength));
+					pi.setValue(readBytes / (float) contentLength);
 					textualProgress.setValue("Processed " + readBytes
 							+ " bytes of " + contentLength);
 				}
 
 			});
-
-			upload.addListener(new Upload.SucceededListener() {
-
-				private static final long serialVersionUID = 1L;
-
-				public void uploadSucceeded(SucceededEvent event) {
-				}
-			});
-
-
 
 			upload.addListener(new Upload.FinishedListener() {
 

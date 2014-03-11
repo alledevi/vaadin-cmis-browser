@@ -84,15 +84,29 @@ public abstract class CmisClient implements DocumentFetcher {
     }
 
     /**
-     * Determines an object existence.
+     * Determines an object's existence.
+     *
+     * @param pathOrId the path or id of the object
+     * @return {@code true} if the object exists, {@code false} otherwise
      */
-    private boolean exists(String pathOrId) {
+    public boolean exists(String pathOrId) {
         try {
             getObject(pathOrId);
             return true;
-        } catch (RuntimeException e) {
+        } catch (CmisBaseException e) {
             return false;
         }
+    }
+
+    /**
+     * Determines an object's existence.
+     *
+     * @param parentPath the path of the parent
+     * @param childName  the name of the child
+     * @return {@code true} if the object exists, {@code false} otherwise
+     */
+    public boolean exists(String parentPath, String childName) {
+        return exists(joinPath(parentPath, childName));
     }
 
     /**
@@ -201,14 +215,24 @@ public abstract class CmisClient implements DocumentFetcher {
      * Returns if {@code path} is a folder.
      */
     public boolean isFolder(String path) {
-        return getObject(path) instanceof Folder;
+        try {
+            CmisObject cmisObject = getObject(path);
+            return cmisObject instanceof Folder;
+        } catch (CmisBaseException e) {
+            return false;
+        }
     }
 
     /**
      * Returns if {@code path} is a document.
      */
     public boolean isDocument(String path) {
-        return getObject(path) instanceof Document;
+        try {
+            CmisObject cmisObject = getObject(path);
+            return cmisObject instanceof Document;
+        } catch (CmisBaseException e) {
+            return false;
+        }
     }
 
     /**
@@ -258,18 +282,18 @@ public abstract class CmisClient implements DocumentFetcher {
     /**
      * Uploads a document.
      *
-     * @param parentIdOrPath       the id or path of the parent folder
-     * @param fileName             the source file
-     * @param mimeType             the MIME Type of the source file
-     * @param inputStream          the input stream
-     * @param length               the source file length
-     * @param versioningState      the versioning state
-     * @param additionalProperties additional properties for the uploaded files
+     * @param parentIdOrPath  the id or path of the parent folder
+     * @param fileName        the source file
+     * @param mimeType        the MIME Type of the source file
+     * @param inputStream     the input stream
+     * @param length          the source file length
+     * @param versioningState the versioning state
+     * @param properties      properties of the uploaded files
      * @return the uploaded document
      */
     public DocumentView upload(String parentIdOrPath, String fileName, String mimeType,
                                InputStream inputStream, BigInteger length, VersioningState versioningState,
-                               String checkInComment, Map<? extends String, ?> additionalProperties) {
+                               String checkInComment, Map<String, Object> properties) {
         String cmisType = versionableCmisType;
         Folder parentFolder = getBareFolder(parentIdOrPath);
 
@@ -277,21 +301,15 @@ public abstract class CmisClient implements DocumentFetcher {
             mimeType = MimeTypes.getMIMEType(fileName);
         }
 
-        // Setup basic properties
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(PropertyIds.OBJECT_TYPE_ID, cmisType);
-        properties.put(PropertyIds.NAME, fileName);
-
-        // Setup cool properties
-        if (additionalProperties != null) {
-            properties.putAll(additionalProperties);
-        }
-
         ContentStream contentStream = new ContentStreamImpl(fileName, length, mimeType, inputStream);
 
         Document document = null;
 
         String documentPath = joinPath(parentFolder.getPath(), fileName);
+
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
 
         try {
             if (exists(documentPath)) {
@@ -301,6 +319,8 @@ public abstract class CmisClient implements DocumentFetcher {
                 document = getBareDocument(documentPath);
             } else {
                 // Create new document
+                properties.put(PropertyIds.OBJECT_TYPE_ID, cmisType);
+                properties.put(PropertyIds.NAME, fileName);
                 document = parentFolder.createDocument(properties, contentStream, versioningState);
             }
         } finally {

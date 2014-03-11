@@ -25,7 +25,7 @@ public abstract class DocumentUploader implements Upload.Receiver, Upload.Succee
     private final CmisClient client;
     private final String parent;
     private String fileName;
-    private VersioningState versioningState;
+    private VersioningState versioningState = VersioningState.MAJOR;
     private String checkInComment;
     private final Map<String, Object> properties = new HashMap<>();
 

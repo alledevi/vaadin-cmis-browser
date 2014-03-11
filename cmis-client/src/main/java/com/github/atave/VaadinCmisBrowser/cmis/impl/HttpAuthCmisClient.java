@@ -77,7 +77,6 @@ public abstract class HttpAuthCmisClient extends CmisClient {
             // Connection settings
             parameters.put(SessionParameter.ATOMPUB_URL, getAtomPubUrl());
             parameters.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-            parameters.put(SessionParameter.OBJECT_FACTORY_CLASS, "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
 
             return parameters;
         }
