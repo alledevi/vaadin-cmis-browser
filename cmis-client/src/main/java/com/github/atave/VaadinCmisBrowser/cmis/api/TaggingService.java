@@ -1,8 +1,8 @@
 package com.github.atave.VaadinCmisBrowser.cmis.api;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 
 public interface TaggingService {
@@ -19,16 +19,18 @@ public interface TaggingService {
      * Deletes a tag.
      *
      * @param tag the tag to delete
+     * @return {@code true} if the operation had success, {@code false} otherwise
      */
-    void deleteTag(String tag) throws IOException;
+    boolean deleteTag(String tag) throws IOException;
 
     /**
      * Renames a tag.
      *
      * @param tag    the old name
      * @param newTag the new name
+     * @return {@code true} if the operation had success, {@code false} otherwise
      */
-    void editTag(String tag, String newTag) throws IOException;
+    boolean editTag(String tag, String newTag) throws IOException;
 
     /**
      * Retrieves all tags.
@@ -43,24 +45,24 @@ public interface TaggingService {
      * @param objectId the {@code cmis:objectId}
      * @return the tags of the specified object
      */
-    Set<String> getTags(String objectId) throws IOException;
+    Collection<String> getTags(String objectId) throws IOException;
 
     /**
-     * Replaces the set of tags of an object.
+     * Replaces the tags of an object.
      *
      * @param objectId the {@code cmis:objectId}
-     * @param tags     the set of tags to set
+     * @param tags     the tags to set
      */
-    void setTags(String objectId, Set<String> tags);
+    void setTags(String objectId, Collection<String> tags) throws IOException;
 
     /**
-     * Adds tags to an object.
+     * Add tags to an object.
      *
      * @param objectId the {@code cmis:objectId}
      * @param tags     the tags to add
      * @return the tags of the specified object
      */
-    Set<String> addTags(String objectId, Set<String> tags) throws IOException;
+    Collection<String> addTags(String objectId, Collection<String> tags) throws IOException;
 
     /**
      * Removes a tag from an object.
@@ -68,13 +70,13 @@ public interface TaggingService {
      * @param objectId the {@code cmis:objectId}
      * @param tags     the tags to remove
      */
-    void removeTags(String objectId, Set<String> tags) throws IOException;
+    void removeTags(String objectId, Collection<String> tags) throws IOException;
 
     /**
      * Searches for objects with the specified tag.
      *
      * @param tag the tag to match
-     * @return a {@code Set} of {@code cmis:objectId}s
+     * @return {@code cmis:objectId}s
      */
-    Set<String> getObjectIds(String tag) throws IOException;
+    Collection<String> getObjectIds(String tag) throws IOException;
 }

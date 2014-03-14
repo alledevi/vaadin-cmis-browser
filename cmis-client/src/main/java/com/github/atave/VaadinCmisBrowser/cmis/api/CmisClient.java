@@ -10,6 +10,7 @@ import org.apache.chemistry.opencmis.commons.enums.ContentStreamAllowed;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.MimeTypes;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
@@ -79,7 +80,7 @@ public abstract class CmisClient implements DocumentFetcher {
      * @param pathOrId the path or id of the object
      * @return the object
      */
-    private CmisObject getObject(String pathOrId) {
+    protected CmisObject getObject(String pathOrId) {
         return FileUtils.getObject(pathOrId, currentSession);
     }
 
@@ -93,7 +94,7 @@ public abstract class CmisClient implements DocumentFetcher {
         try {
             getObject(pathOrId);
             return true;
-        } catch (CmisBaseException e) {
+        } catch (CmisObjectNotFoundException e) {
             return false;
         }
     }
@@ -218,7 +219,7 @@ public abstract class CmisClient implements DocumentFetcher {
         try {
             CmisObject cmisObject = getObject(path);
             return cmisObject instanceof Folder;
-        } catch (CmisBaseException e) {
+        } catch (CmisObjectNotFoundException e) {
             return false;
         }
     }
@@ -230,7 +231,7 @@ public abstract class CmisClient implements DocumentFetcher {
         try {
             CmisObject cmisObject = getObject(path);
             return cmisObject instanceof Document;
-        } catch (CmisBaseException e) {
+        } catch (CmisObjectNotFoundException e) {
             return false;
         }
     }
@@ -411,12 +412,13 @@ public abstract class CmisClient implements DocumentFetcher {
     /**
      * Searches all versions of every document in the current CMIS repository.
      *
-     * @param name       a string that has to be contained in the name of the document
-     * @param text       a string that has to be contained in the text of the document
-     * @param properties the additional properties the document must match
+     * @param name        a string that has to be contained in the name of the document
+     * @param text        a string that has to be contained in the text of the document
+     * @param properties  the additional properties the document must match
+     * @param allVersions whether to query all document versions
      * @return an {@link ItemIterable} of documents matching the query
      */
-    public ItemIterable<DocumentView> search(String name, String text, Collection<PropertyMatcher> properties) {
+    public ItemIterable<DocumentView> search(String name, String text, Collection<PropertyMatcher> properties, boolean allVersions) {
         // Build query
         String type = BaseTypeId.CMIS_DOCUMENT.value();
         QueryBuilder queryBuilder = new QueryBuilder(this, currentSession)
@@ -437,7 +439,19 @@ public abstract class CmisClient implements DocumentFetcher {
         }
 
         // Execute query
-        return queryBuilder.executeQuery(true);
+        return queryBuilder.executeQuery(allVersions);
+    }
+
+    /**
+     * Searches all versions of every document in the current CMIS repository.
+     *
+     * @param name       a string that has to be contained in the name of the document
+     * @param text       a string that has to be contained in the text of the document
+     * @param properties the additional properties the document must match
+     * @return an {@link ItemIterable} of documents matching the query
+     */
+    public ItemIterable<DocumentView> search(String name, String text, Collection<PropertyMatcher> properties) {
+        return search(name, text, properties, true);
     }
 
     /**

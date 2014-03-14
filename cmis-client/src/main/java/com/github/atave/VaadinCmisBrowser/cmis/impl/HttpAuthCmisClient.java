@@ -19,15 +19,15 @@ public abstract class HttpAuthCmisClient extends CmisClient {
 
     private final String user;
     private final String password;
-    private final String atomPubUrl;
+    private final String bindingUrl;
 
     /**
      * Constructs an {@code HttpAuthCmisClient} with the provided credentials.
      */
-    protected HttpAuthCmisClient(String user, String password, String atomPubUrl) {
-        this.user = user;
+    protected HttpAuthCmisClient(String username, String password, String bindingUrl) {
+        this.user = username;
         this.password = password;
-        this.atomPubUrl = atomPubUrl;
+        this.bindingUrl = bindingUrl;
 
         // Smart autoconnect
         Collection<RepositoryView> repositories = getRepositories();
@@ -53,8 +53,8 @@ public abstract class HttpAuthCmisClient extends CmisClient {
     /**
      * Returns the AtomPub binding URL for this client.
      */
-    protected String getAtomPubUrl() {
-        return atomPubUrl;
+    protected String getBindingUrl() {
+        return bindingUrl;
     }
 
     @Override
@@ -75,8 +75,19 @@ public abstract class HttpAuthCmisClient extends CmisClient {
             parameters.put(SessionParameter.PASSWORD, password);
 
             // Connection settings
-            parameters.put(SessionParameter.ATOMPUB_URL, getAtomPubUrl());
-            parameters.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+            BindingType binding;
+            String url;
+
+            if (getBindingUrl().contains("atom")) {
+                binding = BindingType.ATOMPUB;
+                url = SessionParameter.ATOMPUB_URL;
+            } else {
+                binding = BindingType.BROWSER;
+                url = SessionParameter.BROWSER_URL;
+            }
+
+            parameters.put(SessionParameter.BINDING_TYPE, binding.value());
+            parameters.put(url, getBindingUrl());
 
             return parameters;
         }

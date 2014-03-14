@@ -1,9 +1,9 @@
 package com.github.atave.VaadinCmisBrowser.cmis.impl;
 
 import com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient;
-import com.github.atave.VaadinCmisBrowser.utils.Config;
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
+import com.github.atave.VaadinCmisBrowser.utils.Config;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -58,7 +58,7 @@ public abstract class CmisClientTestBase {
         webApp.setWar(WAR);
 
         // Set the context path
-        String[] splitAtomPubUrl = Config.get(OpenCmisInMemoryClient.ATOMPUB_URL).split("/");
+        String[] splitAtomPubUrl = OpenCmisInMemoryClient.BINDING_URL.split("/");
         String contextPath = "/" + splitAtomPubUrl[splitAtomPubUrl.length - 2];
         webApp.setContextPath(contextPath);
 
@@ -69,7 +69,7 @@ public abstract class CmisClientTestBase {
 
         // Create the client
         int port = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
-        String atomPubUrl = "http://localhost:" + port + contextPath + "/atom11";
+        String atomPubUrl = "http://localhost:" + port + Config.get(OpenCmisInMemoryClient.BINDING_PROPERTY);
         client = new OpenCmisInMemoryClient(Config.get(USER), Config.get(PASSWORD), atomPubUrl);
     }
 

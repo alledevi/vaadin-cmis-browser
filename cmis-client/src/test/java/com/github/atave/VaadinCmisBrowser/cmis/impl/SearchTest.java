@@ -1,6 +1,9 @@
 package com.github.atave.VaadinCmisBrowser.cmis.impl;
 
-import com.github.atave.VaadinCmisBrowser.cmis.api.*;
+import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
+import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyMatcher;
+import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyType;
+import com.github.atave.VaadinCmisBrowser.cmis.api.QueryOperator;
 import com.github.atave.VaadinCmisBrowser.utils.Config;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
