@@ -1,50 +1,7 @@
-# Project Structure
+## Project Structure
 This is a Maven project with two modules:
 - **cmis-client**: implements a simple CMIS client that builds upon [Apache Chemistry OpenCMIS](http://chemistry.apache.org/java/opencmis.html) to provide a far less granular interface to a CMIS repository
 - **vaadin-ui**: implements the web interface of the application with [vaadin](https://vaadin.com/)
-
-# Development guide
-
-## Setup
-1. Fork this repo
-
-1. Clone your fork
-```sh
-$ git clone https://github.com/username/vaadin-cmis-browser.git --single-branch
-```
-
-1. Create your personal branch for development
-```sh
-$ cd vaadin-cmis-browser
-$ git checkout -b username
-```
-
-1. Configure remotes
-```sh
-$ git remote add upstream https://github.com/atave/vaadin-cmis-browser.git
-```
-
-1. Check if Maven can fetch all dependencies by running the web application
-```sh
-$ cd vaadin-ui
-$ mvn jetty:run
-```
-
-1. If jetty starts, check out in your browser the following addresses: [1](http://localhost:8080) and [2](http://localhost:8080/opencmis-inmemory/)
-
-
-## Workflow
-1. Write your code
-
-1. Test it
-
-1. Commit and push your changes to a remote branch
-
-1. [Open a Pull Request](https://help.github.com/articles/using-pull-requests)
-
-1. Wait for me to review and merge those changes into *master*
-
-1. Merge those changes back
 
 ## CmisClient API Tutorial
 
@@ -174,18 +131,54 @@ results = client.search(null, text);
 results = client.search(name, null);
 
 // Let's specify additional properties the documents must match:
-// 1. it must have been created by 'creative_user'
-// 2. it must have been modified by 'disruptive_user'
-// 3. it must have been modified before Christmas Day
+// 1. it must have been created by userA'
+// 2. it must have been modified by 'userB'
+// 3. it must have been modified before Christmas
 Collection<PropertyMatcher> matchers = new ArrayList<>();
-matchers.add(new PropertyMatcher("cmis:createdBy", QueryOperator.EQUALS, PropertyType.STRING, "creative_user"));
-matchers.add(new PropertyMatcher("cmis:lastModifiedBy", QueryOperator.EQUALS, PropertyType.STRING, "disruptive_user"));
+matchers.add(new PropertyMatcher("cmis:createdBy", QueryOperator.EQUALS, PropertyType.STRING, "userA"));
+matchers.add(new PropertyMatcher("cmis:lastModifiedBy", QueryOperator.EQUALS, PropertyType.STRING, "userB"));
 matchers.add(new PropertyMatcher("cmis:lastModificationDate", QueryOperator.LESS_THAN, PropertyType.DATETIME, new Date(2013, 12, 25)));
 
 results = client.search(name, text, matchers);
 ```
 
+### Document tagging (Alfresco example)
+```java
 
-## Notes
-- The *mvn-repo* branch is an embedded Maven repository used to distribute **cmis-client** updates as soon as they are ready.  
-If a build fails, try to run it again like so: `mvn -U clean your_goals`.
+AlfrescoClient client = new AlfrescoClient("admin", "admin");
+
+// Create some tags
+client.createTag("tag1");
+client.createTag("tag2");
+client.createTag("tag4");
+client.createTag("ops");
+
+// Delete a tag
+client.deleteTag("ops");
+
+// Rename a tag
+client.editTag("tag4", "tag3");
+
+// Get all tags in the repository
+Map<String, String> allTags = client.getAllTags();
+
+// Get all tags of a document
+String documentPath = "/path/to/my/document";
+String documentId = client.getDocument(documentPath).getId();
+Collection<String> tags = client.getTags(documentId);
+
+// Set tags of a document
+String[] tags = {"tag2", "tag3"};
+client.setTags(documentId, Arrays.asList(tags));
+
+// Add tags to a document
+client.addTags(documentId, Collections.singleton("tag1"));
+client.addTags(documentId, Collections.singleton("tag0"));
+
+// Remove tags from a document
+client.removeTags(documentId, Collections.singleton("tag0");
+
+// Search for documents with tags "tag2" and "tag3"
+PropertyMatcher matcher = new AlfrescoClient.TagMatcher(tags);
+ItemIterable<DocumentView> results = client.search(null, null, Collections.singleton(matcher));
+```
