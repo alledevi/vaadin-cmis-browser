@@ -2,7 +2,10 @@ package com.github.atave.VaadinCmisBrowser.cmis.impl;
 
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyMatcher;
+import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyType;
+import com.github.atave.VaadinCmisBrowser.cmis.api.QueryOperator;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -14,10 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(JUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -168,6 +168,27 @@ public class AlfrescoTests {
         }
     }
 
+    private Collection<PropertyMatcher> getMatchers(String... tags) {
+        Collection<PropertyMatcher> matchers = new ArrayList<>();
+
+        matchers.add(new PropertyMatcher(
+                PropertyIds.CREATION_DATE,
+                QueryOperator.LESS_THAN_OR_EQUALS,
+                PropertyType.DATETIME,
+                new Date()));
+
+        matchers.add(new PropertyMatcher(
+                PropertyIds.CREATED_BY,
+                QueryOperator.EQUALS,
+                PropertyType.STRING,
+                client.getUser()
+        ));
+
+        matchers.add(new AlfrescoClient.TagMatcher(tags));
+
+        return matchers;
+    }
+
     @Test
     public void tagSearch() throws IOException {
         // Make some new documents
@@ -192,18 +213,19 @@ public class AlfrescoTests {
         }
 
         // Search these documents
-        PropertyMatcher matcher = new AlfrescoClient.TagMatcher(new String[]{"tagB"});
-        ItemIterable<DocumentView> results = client.search(null, null, Collections.singleton(matcher));
+        ItemIterable<DocumentView> results = client.search(null, null, getMatchers("tagB"));
         Assert.assertEquals(3, results.getTotalNumItems());
 
-        matcher = new AlfrescoClient.TagMatcher(new String[]{"tagE"});
-        results = client.search(null, null, Collections.singleton(matcher));
+        results = client.search(null, null, getMatchers("tagE"));
         Assert.assertEquals(2, results.getTotalNumItems());
 
-        matcher = new AlfrescoClient.TagMatcher(new String[]{"tagA", "tagB"});
-        results = client.search(null, null, Collections.singleton(matcher));
+        results = client.search(null, null, getMatchers("tagA", "tagB"));
         Assert.assertEquals(1, results.getTotalNumItems());
         Assert.assertEquals(files[0], results.iterator().next().getName());
+
+        results = client.search(files[1], null, null);
+        Assert.assertEquals(1, results.getTotalNumItems());
+        Assert.assertEquals(files[1], results.iterator().next().getName());
 
         // Cleanup
         for (int i = 0; i < files.length; ++i) {
