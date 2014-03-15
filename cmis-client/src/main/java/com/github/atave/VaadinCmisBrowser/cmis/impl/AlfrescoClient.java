@@ -266,37 +266,41 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
     @Override
     public ItemIterable<DocumentView> search(String name, String text, Collection<PropertyMatcher> matchers) {
-        Set<String> ids = null;
-        Collection<PropertyMatcher> filtered = new ArrayList<>();
+        Collection<PropertyMatcher> filtered = null;
 
-        for (PropertyMatcher matcher : matchers) {
-            if (matcher.getProperty().equals(TAGGABLE_ASPECT_ID)) {
-                for (Object tag : matcher.getValues()) {
-                    try {
-                        Set<String> currentIds = new HashSet<>(getObjectIds((String) tag));
+        if (matchers != null) {
+            Set<String> ids = null;
+            filtered = new ArrayList<>();
 
-                        if (ids == null) {
-                            ids = currentIds;
-                        } else {
-                            ids.retainAll(currentIds);
+            for (PropertyMatcher matcher : matchers) {
+                if (matcher.getProperty().equals(TAGGABLE_ASPECT_ID)) {
+                    for (Object tag : matcher.getValues()) {
+                        try {
+                            Set<String> currentIds = new HashSet<>(getObjectIds((String) tag));
+
+                            if (ids == null) {
+                                ids = currentIds;
+                            } else {
+                                ids.retainAll(currentIds);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
+                } else {
+                    filtered.add(matcher);
                 }
-            } else {
+            }
+
+            if (ids != null) {
+                PropertyMatcher matcher = new PropertyMatcher(
+                        PropertyIds.OBJECT_ID,
+                        QueryOperator.IN,
+                        PropertyType.STRING_SET,
+                        ids.toArray()
+                );
                 filtered.add(matcher);
             }
-        }
-
-        if (ids != null) {
-            PropertyMatcher matcher = new PropertyMatcher(
-                    PropertyIds.OBJECT_ID,
-                    QueryOperator.IN,
-                    PropertyType.STRING_SET,
-                    ids.toArray()
-            );
-            filtered.add(matcher);
         }
 
         return super.search(name, text, filtered, false);
