@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * A {@link com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient} implementation for Alfresco.
  */
-public class AlfrescoClient extends HttpAuthCmisClient implements TaggingService {
+public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
     private static final String SCHEME_PROPERTY = "alfresco.scheme";
     private static final String HOSTNAME_PROPERTY = "alfresco.hostname";

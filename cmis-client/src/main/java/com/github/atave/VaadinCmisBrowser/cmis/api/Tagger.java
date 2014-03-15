@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 
-public interface TaggingService {
+public interface Tagger {
 
     /**
      * Creates a new tag.
