@@ -62,9 +62,13 @@ public class AlfrescoTests {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws IOException {
         if (client.exists(filePath)) {
             client.deleteDocument(filePath);
+        }
+
+        for (String tag : tags) {
+            Assert.assertTrue(client.deleteTag(tag));
         }
     }
 
