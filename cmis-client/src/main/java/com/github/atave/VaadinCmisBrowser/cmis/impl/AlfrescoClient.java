@@ -3,6 +3,7 @@ package com.github.atave.VaadinCmisBrowser.cmis.impl;
 import com.github.atave.VaadinCmisBrowser.cmis.api.*;
 import com.github.atave.VaadinCmisBrowser.utils.Config;
 import com.github.atave.VaadinCmisBrowser.utils.RestClient;
+import com.github.atave.junderscore.Lambda1;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -13,6 +14,8 @@ import org.apache.chemistry.opencmis.commons.impl.json.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
+
+import static com.github.atave.junderscore.JUnderscore._;
 
 
 /**
@@ -98,6 +101,8 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
     @Override
     public boolean deleteTag(String tag) throws IOException {
+        tag = tag.toLowerCase();
+
         return restClient.delete(
                 String.format(TAG_DETAIL_URL, tag),
                 new RestClient.EntityHandler<Boolean, JSONObject>() {
@@ -111,6 +116,8 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
     @Override
     public boolean editTag(String tag, String newTag) throws IOException {
+        tag = tag.toLowerCase();
+
         JSONObject data = new JSONObject();
         data.put("name", newTag.toLowerCase());
 
@@ -182,7 +189,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
         Map<String, String> tagMap = getAllTags();
         for (String tag : tags) {
-            tagIds.add(tagMap.get(tag));
+            tagIds.add(tagMap.get(tag.toLowerCase()));
         }
 
         properties.put(TAGGABLE_ASPECT_ID, tagIds);
@@ -194,7 +201,12 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
         objectId = normalizeNodeRef(objectId);
 
         JSONArray data = new JSONArray();
-        data.addAll(tags);
+        data.addAll(_(tags).map(new Lambda1<Object, String>() {
+            @Override
+            public Object call(String o) {
+                return o.toLowerCase();
+            }
+        }));
 
         return restClient.post(
                 String.format(TAGS_FOR_NODE_URL, objectId),
@@ -219,13 +231,20 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
         objectId = normalizeNodeRef(objectId);
 
         Collection<String> currentTags = getTags(objectId);
-        currentTags.removeAll(tags);
+        currentTags.removeAll(_(tags).map(new Lambda1<Object, String>() {
+            @Override
+            public Object call(String o) {
+                return o.toLowerCase();
+            }
+        }));
 
         setTags(objectId, currentTags);
     }
 
     @Override
     public Collection<String> getObjectIds(String tag) throws IOException {
+        tag = tag.toLowerCase();
+
         return restClient.get(
                 String.format(NODES_FOR_TAG_URL, tag),
                 new RestClient.EntityHandler<Collection<String>, JSONArray>() {
