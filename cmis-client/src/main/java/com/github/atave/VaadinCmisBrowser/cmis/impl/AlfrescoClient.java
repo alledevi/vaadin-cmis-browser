@@ -85,9 +85,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
         return restClient.post(
                 TAG_LIST_URL,
                 data,
-                new RestClient.EntityHandler<String, JSONObject>() {
+                new RestClient.JSONHandler<String, JSONObject>() {
                     @Override
-                    public String handle(JSONObject parsedJSON) {
+                    public String handleJSON(JSONObject parsedJSON) {
                         Boolean itemExists = (Boolean) parsedJSON.get("itemExists");
                         if (itemExists) {
                             return null;
@@ -105,9 +105,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
         return restClient.delete(
                 String.format(TAG_DETAIL_URL, tag),
-                new RestClient.EntityHandler<Boolean, JSONObject>() {
+                new RestClient.JSONHandler<Boolean, JSONObject>() {
                     @Override
-                    public Boolean handle(JSONObject parsedJSON) {
+                    public Boolean handleJSON(JSONObject parsedJSON) {
                         return (Boolean) parsedJSON.get("result");
                     }
                 }
@@ -124,9 +124,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
         return restClient.put(
                 String.format(TAG_DETAIL_URL, tag),
                 data,
-                new RestClient.EntityHandler<Boolean, JSONObject>() {
+                new RestClient.JSONHandler<Boolean, JSONObject>() {
                     @Override
-                    public Boolean handle(JSONObject parsedJSON) {
+                    public Boolean handleJSON(JSONObject parsedJSON) {
                         return (Boolean) parsedJSON.get("result");
                     }
                 }
@@ -137,9 +137,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
     public Map<String, String> getAllTags() throws IOException {
         return restClient.get(
                 TAG_LIST_URL + "?details=true",
-                new RestClient.EntityHandler<Map<String, String>, JSONObject>() {
+                new RestClient.JSONHandler<Map<String, String>, JSONObject>() {
                     @Override
-                    public Map<String, String> handle(JSONObject parsedJSON) {
+                    public Map<String, String> handleJSON(JSONObject parsedJSON) {
                         Map<String, String> map = new HashMap<>();
 
                         JSONObject data = (JSONObject) parsedJSON.get("data");
@@ -165,9 +165,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
         return restClient.get(
                 String.format(TAGS_FOR_NODE_URL, objectId),
-                new RestClient.EntityHandler<Collection<String>, JSONArray>() {
+                new RestClient.JSONHandler<Collection<String>, JSONArray>() {
                     @Override
-                    public Collection<String> handle(JSONArray parsedJSON) {
+                    public Collection<String> handleJSON(JSONArray parsedJSON) {
                         Collection<String> retval = new ArrayList<>();
 
                         for (Object object : parsedJSON) {
@@ -211,9 +211,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
         return restClient.post(
                 String.format(TAGS_FOR_NODE_URL, objectId),
                 data,
-                new RestClient.EntityHandler<Collection<String>, JSONArray>() {
+                new RestClient.JSONHandler<Collection<String>, JSONArray>() {
                     @Override
-                    public Collection<String> handle(JSONArray parsedJSON) {
+                    public Collection<String> handleJSON(JSONArray parsedJSON) {
                         Collection<String> retval = new ArrayList<>();
 
                         for (Object object : parsedJSON) {
@@ -247,9 +247,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
         return restClient.get(
                 String.format(NODES_FOR_TAG_URL, tag),
-                new RestClient.EntityHandler<Collection<String>, JSONArray>() {
+                new RestClient.JSONHandler<Collection<String>, JSONArray>() {
                     @Override
-                    public Collection<String> handle(JSONArray parsedJSON) {
+                    public Collection<String> handleJSON(JSONArray parsedJSON) {
                         Collection<String> retval = new ArrayList<>();
 
                         for (Object object : parsedJSON) {

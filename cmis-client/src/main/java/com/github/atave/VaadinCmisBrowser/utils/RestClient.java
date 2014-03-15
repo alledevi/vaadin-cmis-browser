@@ -24,10 +24,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -148,7 +145,7 @@ public class RestClient {
         return context;
     }
 
-    protected <J, T> T process(String method, String url, JSONAware data, final EntityHandler<T, J> jsonHandler) throws IOException {
+    protected <T> T process(String method, String url, JSONAware data, final EntityHandler<T> entityHandler) throws IOException {
         ResponseHandler<T> responseHandler = new ResponseHandler<T>() {
             @Override
             public T handleResponse(HttpResponse response) throws IOException {
@@ -158,22 +155,17 @@ public class RestClient {
                     throw new HttpResponseException(statusCode, statusLine.getReasonPhrase());
                 }
 
-                BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                BufferedReader entityReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
-                JSONParser parser = new JSONParser();
-
-                Object parsedJson = null;
-                try {
-                    parsedJson = parser.parse(br);
-                } catch (JSONParseException e) {
-                    e.printStackTrace();
+                if (entityHandler != null) {
+                    try {
+                        return entityHandler.handle(entityReader);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
-                if (jsonHandler != null) {
-                    return jsonHandler.handle((J) parsedJson);
-                } else {
-                    return null;
-                }
+                return null;
             }
         };
 
@@ -184,23 +176,35 @@ public class RestClient {
         return httpClient.execute(target, request, responseHandler, context);
     }
 
-    public <J, T> T get(String url, final EntityHandler<T, J> jsonHandler) throws IOException {
-        return process(GET, url, null, jsonHandler);
+    public <T> T get(String url, final EntityHandler<T> entityHandler) throws IOException {
+        return process(GET, url, null, entityHandler);
     }
 
-    public <J, T> T post(String url, JSONAware data, final EntityHandler<T, J> jsonHandler) throws IOException {
-        return process(POST, url, data, jsonHandler);
+    public <T> T post(String url, JSONAware data, final EntityHandler<T> entityHandler) throws IOException {
+        return process(POST, url, data, entityHandler);
     }
 
-    public <J, T> T put(String url, JSONAware data, final EntityHandler<T, J> jsonHandler) throws IOException {
-        return process(PUT, url, data, jsonHandler);
+    public <T> T put(String url, JSONAware data, final EntityHandler<T> entityHandler) throws IOException {
+        return process(PUT, url, data, entityHandler);
     }
 
-    public <J, T> T delete(String url, final EntityHandler<T, J> jsonHandler) throws IOException {
-        return process(DELETE, url, null, jsonHandler);
+    public <T> T delete(String url, final EntityHandler<T> entityHandler) throws IOException {
+        return process(DELETE, url, null, entityHandler);
     }
 
-    public static interface EntityHandler<T, J> {
-        T handle(J parsedJSON);
+    public static interface EntityHandler<T> {
+        T handle(Reader entityReader) throws Exception;
+    }
+
+    public abstract static class JSONHandler<T, J> implements EntityHandler<T> {
+
+        protected abstract T handleJSON(J parsedJSON);
+
+        @Override
+        public T handle(Reader entityReader) throws IOException, JSONParseException {
+            JSONParser parser = new JSONParser();
+
+            return handleJSON((J) parser.parse(entityReader));
+        }
     }
 }
