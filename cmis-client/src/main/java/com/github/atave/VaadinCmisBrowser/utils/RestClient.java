@@ -155,11 +155,11 @@ public class RestClient {
                     throw new HttpResponseException(statusCode, statusLine.getReasonPhrase());
                 }
 
-                BufferedReader entityReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                InputStream content = response.getEntity().getContent();
 
                 if (entityHandler != null) {
                     try {
-                        return entityHandler.handle(entityReader);
+                        return entityHandler.handle(content);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -193,7 +193,7 @@ public class RestClient {
     }
 
     public static interface EntityHandler<T> {
-        T handle(Reader entityReader) throws Exception;
+        T handle(InputStream inputStream) throws Exception;
     }
 
     public abstract static class JSONHandler<T, J> implements EntityHandler<T> {
@@ -201,10 +201,11 @@ public class RestClient {
         protected abstract T handleJSON(J parsedJSON);
 
         @Override
-        public T handle(Reader entityReader) throws IOException, JSONParseException {
-            JSONParser parser = new JSONParser();
-
-            return handleJSON((J) parser.parse(entityReader));
+        public T handle(InputStream inputStream) throws IOException, JSONParseException {
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                JSONParser parser = new JSONParser();
+                return handleJSON((J) parser.parse(reader));
+            }
         }
     }
 }

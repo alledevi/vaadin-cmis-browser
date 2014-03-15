@@ -12,7 +12,7 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.impl.json.JSONArray;
 import org.apache.chemistry.opencmis.commons.impl.json.JSONObject;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import static com.github.atave.junderscore.JUnderscore._;
@@ -21,7 +21,7 @@ import static com.github.atave.junderscore.JUnderscore._;
 /**
  * A {@link com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient} implementation for Alfresco.
  */
-public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
+public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbnailer {
 
     private static final String SCHEME_PROPERTY = "alfresco.scheme";
     private static final String HOSTNAME_PROPERTY = "alfresco.hostname";
@@ -35,12 +35,19 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
 
     private static final String BINDING_URL = SCHEME + "://" + HOSTNAME + ":" + PORT + BINDING;
 
-    private static final String TAG_LIST_URL = "/alfresco/service/api/tags/workspace/SpacesStore";
-    private static final String TAG_DETAIL_URL = "/alfresco/service/api/tags/%s";
-    private static final String TAGS_FOR_NODE_URL = "/alfresco/service/api/node/workspace/SpacesStore/%s/tags";
-    private static final String NODES_FOR_TAG_URL = "/alfresco/service/api/tags/workspace/SpacesStore/%s/nodes";
+    private static final String BASE_URL = "/alfresco/service/api";
+    private static final String STORE = "/workspace/SpacesStore";
+    private static final String TAGS_BASE_URL = BASE_URL + "/tags";
+    private static final String NODE_BASE_URL = BASE_URL + "/node";
+    private static final String TAG_LIST_URL = TAGS_BASE_URL + STORE;
+    private static final String TAG_DETAIL_URL = TAGS_BASE_URL + "/%s";
+    private static final String TAGS_FOR_NODE_URL = NODE_BASE_URL + STORE + "/%s/tags";
+    private static final String NODES_FOR_TAG_URL = TAGS_BASE_URL + STORE + "/%s/nodes";
+    private static final String THUMBNAIL_LIST_URL = NODE_BASE_URL + STORE + "/%s/content/thumbnails";
+    private static final String THUMBNAIL_DETAIL_URL = THUMBNAIL_LIST_URL + "/%s";
 
     private static final String NODE_REF_KEY = "nodeRef";
+    private static final String THUMBNAIL_KEY = "imgpreview";
 
     public static final String TAGGABLE_ASPECT_ID = "cm:taggable";
 
@@ -318,6 +325,29 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger {
                 return sessionParameters;
             }
         };
+    }
+
+    @Override
+    public InputStream getThumbnail(String objectId) throws IOException {
+        return restClient.get(
+                String.format(THUMBNAIL_DETAIL_URL, normalizeNodeRef(objectId), "doclib"),
+                new RestClient.EntityHandler<InputStream>() {
+                    @Override
+                    public InputStream handle(InputStream inputStream) throws Exception {
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                        byte[] buffer = new byte[4096];
+                        int len;
+
+                        while((len = inputStream.read(buffer)) > -1) {
+                            byteArrayOutputStream.write(buffer, 0, len);
+                        }
+                        byteArrayOutputStream.flush();
+
+                        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                    }
+                }
+        );
     }
 
     /**
