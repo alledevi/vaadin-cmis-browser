@@ -179,6 +179,16 @@ client.addTags(documentId, Collections.singleton("tag0"));
 client.removeTags(documentId, Collections.singleton("tag0");
 
 // Search for documents with tags "tag2" and "tag3"
-PropertyMatcher matcher = new AlfrescoClient.TagMatcher(tags);
+PropertyMatcher matcher = new AlfrescoClient.TagMatcher(tags));
 ItemIterable<DocumentView> results = client.search(null, null, Collections.singleton(matcher));
+```
+
+### Thumbnails (vaadin example)
+```java
+AlfrescoClient client = new AlfrescoClient("admin", "admin");
+
+String documentPath = "/path/to/my/document";
+String documentId = client.getDocument(documentPath).getId();
+
+Image img = new Thumbnail(alfrescoClient, documentId);
 ```
