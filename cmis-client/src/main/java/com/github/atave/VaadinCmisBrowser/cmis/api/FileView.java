@@ -8,6 +8,7 @@ import org.apache.chemistry.opencmis.commons.enums.Action;
 
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 
 /**
@@ -36,21 +37,21 @@ public class FileView {
     }
 
     /**
-     * Returns whether or not this object supports the specified {@code action}.
+     * @return whether or not this object supports the specified {@code action}.
      */
     public boolean can(Action action) {
         return delegate.getAllowableActions().getAllowableActions().contains(action);
     }
 
     /**
-     * Returns the object id.
+     * @return the object id.
      */
     public String getId() {
         return delegate.getId();
     }
 
     /**
-     * Returns the name of this CMIS object (CMIS property
+     * @return the name of this CMIS object (CMIS property
      * <code>cmis:name</code>).
      */
     public String getName() {
@@ -58,7 +59,7 @@ public class FileView {
     }
 
     /**
-     * Returns the description of this CMIS object (CMIS property
+     * @return the description of this CMIS object (CMIS property
      * <code>cmis:description</code>).
      */
     public String getDescription() {
@@ -66,7 +67,7 @@ public class FileView {
     }
 
     /**
-     * Returns the user who created this CMIS object (CMIS property
+     * @return the user who created this CMIS object (CMIS property
      * <code>cmis:createdBy</code>).
      */
     public String getCreatedBy() {
@@ -74,7 +75,7 @@ public class FileView {
     }
 
     /**
-     * Returns the timestamp when this CMIS object has been created (CMIS
+     * @return the timestamp when this CMIS object has been created (CMIS
      * property <code>cmis:creationDate</code>).
      */
     public GregorianCalendar getCreationDate() {
@@ -82,7 +83,7 @@ public class FileView {
     }
 
     /**
-     * Returns the user who modified this CMIS object (CMIS property
+     * @return the user who modified this CMIS object (CMIS property
      * <code>cmis:lastModifiedBy</code>).
      */
     public String getLastModifiedBy() {
@@ -90,7 +91,7 @@ public class FileView {
     }
 
     /**
-     * Returns the timestamp when this CMIS object has been modified (CMIS
+     * @return the timestamp when this CMIS object has been modified (CMIS
      * property <code>cmis:lastModificationDate</code>).
      */
     public GregorianCalendar getLastModificationDate() {
@@ -98,8 +99,6 @@ public class FileView {
     }
 
     /**
-     * Returns the parents of this object.
-     *
      * @return the list of parent folders of this object or an empty list if
      * this object is unfiled or if this object is the root folder
      */
@@ -113,21 +112,26 @@ public class FileView {
     }
 
     /**
-     * Returns the path of this object.
+     * @return the path of this object or {@code null} if this object is unfiled or if this object is the root folder.
      */
     public String getPath() {
-        return delegate.getPaths().get(0);
+        List<String> paths = delegate.getPaths();
+        if (paths.isEmpty()) {
+            return null;
+        } else {
+            return paths.get(0);
+        }
     }
 
     /**
-     * Returns if the file is a document.
+     * @return if the file is a document.
      */
     public boolean isDocument() {
         return delegate instanceof Document;
     }
 
     /**
-     * Returns if the file is a folder.
+     * @return if the file is a folder.
      */
     public boolean isFolder() {
         return delegate instanceof Folder;
