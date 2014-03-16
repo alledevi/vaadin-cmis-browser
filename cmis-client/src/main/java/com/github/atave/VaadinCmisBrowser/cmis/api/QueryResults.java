@@ -77,7 +77,7 @@ public class QueryResults implements ItemIterable<DocumentView> {
          */
         @Override
         public boolean hasNext() {
-            return delegate.hasNext();
+            return delegate.hasNext() || getHasMoreItems();
         }
 
         /**

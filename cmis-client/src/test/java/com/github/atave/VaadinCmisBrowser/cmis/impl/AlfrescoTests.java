@@ -125,6 +125,24 @@ public class AlfrescoTests {
     }
 
     @Test
+    public void excludeUnfiledObjectsFromSearchResults() {
+        PropertyMatcher matcher = new PropertyMatcher(PropertyIds.CREATION_DATE, QueryOperator.LESS_THAN_OR_EQUALS,
+                PropertyType.DATETIME, new Date());
+        ItemIterable<DocumentView> results = client.search(null, null, Collections.singleton(matcher));
+
+        int unfiled = 0;
+        for (DocumentView document : results) {
+            if (document.getPath() == null) {
+                ++unfiled;
+            } else {
+                Assert.assertNotEquals(document.getName(), "woman3.png");
+            }
+        }
+
+        Assert.assertTrue(unfiled > 0);
+    }
+
+    @Test
     public void getAllTags() throws IOException {
         Map<String, String> allTags = client.getAllTags();
         checkTags(allTags.keySet());
@@ -171,14 +189,31 @@ public class AlfrescoTests {
     private Collection<PropertyMatcher> getMatchers(String... tags) {
         Collection<PropertyMatcher> matchers = new ArrayList<>();
 
+        Date now = new Date();
+
         matchers.add(new PropertyMatcher(
                 PropertyIds.CREATION_DATE,
                 QueryOperator.LESS_THAN_OR_EQUALS,
                 PropertyType.DATETIME,
-                new Date()));
+                now
+        ));
+
+        matchers.add(new PropertyMatcher(
+                PropertyIds.LAST_MODIFICATION_DATE,
+                QueryOperator.LESS_THAN_OR_EQUALS,
+                PropertyType.DATETIME,
+                now
+        ));
 
         matchers.add(new PropertyMatcher(
                 PropertyIds.CREATED_BY,
+                QueryOperator.EQUALS,
+                PropertyType.STRING,
+                client.getUser()
+        ));
+
+        matchers.add(new PropertyMatcher(
+                PropertyIds.LAST_MODIFIED_BY,
                 QueryOperator.EQUALS,
                 PropertyType.STRING,
                 client.getUser()
