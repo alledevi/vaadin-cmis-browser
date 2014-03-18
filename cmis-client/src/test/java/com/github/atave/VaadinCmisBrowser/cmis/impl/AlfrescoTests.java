@@ -193,6 +193,13 @@ public class AlfrescoTests {
 
         matchers.add(new PropertyMatcher(
                 PropertyIds.CREATION_DATE,
+                QueryOperator.GREATER_THAN,
+                PropertyType.DATETIME,
+                new Date(System.currentTimeMillis() - 1000 * 3600 * 24)
+        ));
+
+        matchers.add(new PropertyMatcher(
+                PropertyIds.CREATION_DATE,
                 QueryOperator.LESS_THAN_OR_EQUALS,
                 PropertyType.DATETIME,
                 now
