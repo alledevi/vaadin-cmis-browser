@@ -1,33 +1,22 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Collection;
-
-import org.apache.chemistry.opencmis.commons.impl.jaxb.GetFolderParent;
-
-import com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient;
-import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
+import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
+import com.github.atave.VaadinCmisBrowser.vaadin.utils.Thumbnail;
 import com.vaadin.data.Container.Filterable;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.MouseEvents;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.event.MouseEvents.ClickEvent;
-import com.vaadin.event.MouseEvents.ClickListener;
+import com.vaadin.event.MouseEvents;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.DefaultFieldFactory;
-import com.vaadin.ui.Form;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 
@@ -35,14 +24,14 @@ public class TableComponent extends CustomComponent {
 
 	private static final long serialVersionUID = 1L;
 
-	private CmisClient client;
+	private AlfrescoClient client;
 
 	private Panel panel; 
 	private VerticalLayout layout;
 	private Table table;
 	private Tree tree;
 
-	public TableComponent(String path, CmisClient client, Tree tree) {
+	public TableComponent(String path, AlfrescoClient client, Tree tree) {
 		this.client = client;
 		this.tree = tree;
 
@@ -67,6 +56,7 @@ public class TableComponent extends CustomComponent {
 		table.addContainerProperty("created by", String.class, null);
 		table.addContainerProperty("modified by", String.class, null);
 		table.addContainerProperty("path", String.class, null);
+		table.addContainerProperty("isFolder", Integer.class, null);
 		table.addContainerProperty("action", TableActionComponent.class, null);
 		//set cell alignment
 		table.setColumnAlignment("image", Align.CENTER);
@@ -77,17 +67,12 @@ public class TableComponent extends CustomComponent {
 		table.setColumnAlignment("created by", Align.CENTER);
 		table.setColumnAlignment("modified by", Align.CENTER);
 		table.setColumnAlignment("path", Align.CENTER);
+		table.setColumnAlignment("isFolder", Align.CENTER);
 		table.setColumnAlignment("action", Align.CENTER);
-		//reordering column
-//		table.setColumnReorderingAllowed(true);		
-
-
+		
 		//--RIEMPIO TABELLA ROOT--
 		path = client.getCurrentFolder().getPath();
 		populateTable(path);
-//		table.setSortContainerPropertyId("name");
-//		table.sort();
-		
 
 
 		//hide some column
@@ -95,39 +80,45 @@ public class TableComponent extends CustomComponent {
 		table.setColumnCollapsed("created by", true);
 		table.setColumnCollapsed("modified by", true);
 		table.setColumnCollapsed("path", true);
-		table.addItemClickListener(itemListener);   
-
+		table.addItemClickListener(itemListener);  
+		
 		layout.addComponent(table);
 		setCompositionRoot(panel);
-
-
 	}
+
+
+
 
 	//select right icon
 	public Image getFolderIcon(Boolean isFolder, final String fileId, Integer itemId) {
 		Image icon = null;
 		if (isFolder) {
-			icon = new Image("00folder", new ThemeResource("img/folder-icon.png"));
+			icon = new Image("a", new ThemeResource("img/folder-icon.png"));
 			icon.setData(itemId);
 			icon.setWidth("34px");
 		} else {
-			icon = new Image("01document", new ThemeResource("img/document-icon.png"));
+			
+//			String documentPath = "/path/to/my/document";
+//			String documentId = client.getDocument(documentPath).getId();
+
+			icon = new Thumbnail(client, fileId);
+			
+//			icon = new Thumbnail("document", new ThemeResource("img/document-icon.png"));
 			icon.setData(itemId);
 			icon.setWidth("34px");
 		}
 		//open folder
-		icon.addClickListener(new ClickListener() {
+		icon.addClickListener( new MouseEvents.ClickListener() {
 
 			private static final long serialVersionUID = 1L;
 
-			@Override
 			public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
 				// select row
 				Integer id = (Integer)((Image) event.getComponent()).getData();
 				table.select(id);
 				//open folder
 				if(event.isDoubleClick() ){
-//					Object item =  ((ItemClickEvent) event).getItemId();
+					//					Object item =  ((ItemClickEvent) event).getItemId();
 
 					String path = ((String) table.getContainerProperty(id, "path").getValue());
 					FileView fileView = client.getFile(path);
@@ -146,7 +137,14 @@ public class TableComponent extends CustomComponent {
 		});
 		return icon;
 	}
-
+	
+	public void clearTable(){
+		table.removeAllItems();
+	}
+	
+	public void pageLength(){
+		table.setPageLength(10);;
+	}
 
 	public void populateTable(String path){
 		table.removeAllItems();
@@ -175,8 +173,10 @@ public class TableComponent extends CustomComponent {
 										file.getCreatedBy(),
 										file.getLastModifiedBy(),
 										file.getPath(),
+										1,
 										new TableActionComponent(file.getPath(), i, table, client, false)},
 										i);
+						
 					}else{
 						table.addItem(
 								new Object[] {
@@ -188,6 +188,7 @@ public class TableComponent extends CustomComponent {
 										file.getCreatedBy(),
 										file.getLastModifiedBy(),
 										file.getPath(),
+										0,
 										new TableActionComponent(file.getPath(), i, table, client, true)},
 										i);
 					}	
@@ -195,7 +196,59 @@ public class TableComponent extends CustomComponent {
 				}
 			}
 		}
+		IndexedContainer c = (IndexedContainer) table.getContainerDataSource();
+		CaseInsensitiveItemSorter d = new CaseInsensitiveItemSorter();
+		c.setItemSorter(d);
+		boolean[] b = {true, true};
+		Object[] o = {"isFolder","name"};
+		c.sort(o, b);
+		table.setContainerDataSource(c);
+
+
 	}
+//	
+//	public void sortTable(Object[] propertyId, boolean[] ascending)
+//            throws UnsupportedOperationException {
+//        
+//		final Container c = table.getContainerDataSource();
+//        if (c instanceof Container.Sortable) {
+//            final int pageIndex = table.getCurrentPageFirstItemIndex();
+//            boolean refreshingPreviouslyEnabled = false;
+//            ((Container.Sortable) c).sort(propertyId, ascending);
+//            table.setCurrentPageFirstItemIndex(pageIndex);
+//            if (refreshingPreviouslyEnabled) {
+//                (Table.class).refreshRenderedCells();
+//                // Ensure that client gets a response
+//                markAsDirty();
+//            }
+//
+//        } else if (c != null) {
+//            throw new UnsupportedOperationException(
+//                    "Underlying Data does not allow sorting");
+//        }
+//    }
+	
+//	public void sortTable(){
+//		
+//		Collection<Item> folders = null;
+//		Collection<Item> documents = null;
+//		for(Object i : table.getItemIds()){
+//			Image image = (Image) table.getContainerProperty(i, "image").getValue();
+//			if(image.getCaption().equals("folder")){
+//				folders.add(table.getItem(i));
+//			}
+//			else
+//				documents.add(table.getItem(i));	
+//		}
+//		
+//		ArrayList<String> list = new ArrayList<String>();
+//		table.
+//		
+//		folders.
+//		
+//
+//
+//	}
 
 	public void populateTableFromComboBox(String path){
 		table.removeAllItems();
@@ -204,7 +257,6 @@ public class TableComponent extends CustomComponent {
 		} else {
 			//populate table only if path is a folder
 			if ((client.getFile(path)).isFolder()){
-				System.out.println(client.getCurrentFolder().toString());
 				FolderView currentFolder = client.getCurrentFolder();
 				Collection<FileView> files = currentFolder.getChildren();
 				int i = 0;
@@ -226,6 +278,7 @@ public class TableComponent extends CustomComponent {
 										file.getPath(),
 										new TableActionComponent(file.getPath(), i, table, client, false)},
 										i);
+						
 					}else{
 						table.addItem(
 								new Object[] {
@@ -247,14 +300,14 @@ public class TableComponent extends CustomComponent {
 	}
 
 	public void addItemToFolderComponent(String fileId){
-		FileView fileView = client.getFile(fileId);
-		long creationDateMillis = fileView.getCreationDate().getTimeInMillis();
+		FileView file = client.getFile(fileId);
+		long creationDateMillis = file.getCreationDate().getTimeInMillis();
 		Timestamp creationDate = new Timestamp(creationDateMillis);
-		long modificationDateMillis = fileView.getLastModificationDate().getTimeInMillis();
+		long modificationDateMillis = file.getLastModificationDate().getTimeInMillis();
 		Timestamp modificationDate = new Timestamp(modificationDateMillis);
 		int i = table.size() +1;
-		if (fileView.isFolder()){
-			FolderView file = fileView.asFolder();
+		table.setImmediate(true);
+		if (file.isFolder()){
 			table.addItem(
 					new Object[] {
 							getFolderIcon(true, file.getId(), i),
@@ -265,10 +318,10 @@ public class TableComponent extends CustomComponent {
 							file.getCreatedBy(),
 							file.getLastModifiedBy(),
 							file.getPath(),
+							0,
 							new TableActionComponent(file.getPath(), i, table, client, true)},
 							i);
 		} else {
-			DocumentView file = fileView.asDocument();
 			table.addItem(
 					new Object[] {
 							getFolderIcon(false, file.getId(), i),
@@ -279,6 +332,7 @@ public class TableComponent extends CustomComponent {
 							file.getCreatedBy(),
 							file.getLastModifiedBy(), 
 							file.getPath(),
+							1,
 							new TableActionComponent(file.getPath(), i, table, client, false)},
 							i);
 
@@ -296,6 +350,8 @@ public class TableComponent extends CustomComponent {
 	}
 
 	ItemClickListener itemListener = new ItemClickListener() {
+
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void itemClick(ItemClickEvent event) {
@@ -316,41 +372,17 @@ public class TableComponent extends CustomComponent {
 
 		}
 	};
-	
-//	MouseEvents.ClickListener renameListener = new MouseEvents.ClickListener() {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
-//			// TODO Auto-generated method stub
-//			renameFolder(event.getComponent());
-//			
-//
-//		}};
-
 
 	public Filterable getContainerDataSource() {
-		// TODO Auto-generated method stub
 		return (Filterable) table.getContainerDataSource();
 	}
 
 	public void sort(Object[] properties, boolean[] ordering) {
-		// TODO Auto-generated method stub
 		table.sort(properties, ordering);
-		
+
 	}
 
-//	public void renameFolder() {
-//		table.setEditable(true);
-//		DefaultFieldFactory f = null;
-//		table.setTableFieldFactory(f);
-//		
-//	}
-	
 	public String checkOutVersion(String name){
-		String version = "1.0";
-		
 		for(Object id : table.getItemIds()){
 			String value = (String) table.getContainerProperty(id, "name").getValue();
 			if (name.equals(value)){
@@ -359,6 +391,7 @@ public class TableComponent extends CustomComponent {
 		}	
 		return "1.0";
 	}
+
 
 
 }

@@ -2,7 +2,7 @@
 	
 	/* TODO fix in base theme */
 	.v-label {
-		overflow: visible;
+		overflow: visible;     
 	}
 	
 	.v-label.h1 {
@@ -17,6 +17,15 @@
 	.v-label.h2 {
 		color: #404346;
 		font-size: 22px;
+		line-height: 1;
+		font-weight: normal;
+		padding: .5em 0;
+		-webkit-font-smoothing: antialiased;
+	}
+  
+  	.v-label.h3 {
+		color: #404346;
+		font-size: 18px;
 		line-height: 1;
 		font-weight: normal;
 		padding: .5em 0;

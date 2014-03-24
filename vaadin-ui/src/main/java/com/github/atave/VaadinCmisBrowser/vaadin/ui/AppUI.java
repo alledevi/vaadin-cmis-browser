@@ -1,15 +1,19 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.servlet.annotation.WebServlet;
+
+import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 
 import com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
-import com.github.atave.VaadinCmisBrowser.cmis.impl.OpenCmisInMemoryClient;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.server.Page;
@@ -17,12 +21,10 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.MenuBar.Command;
-import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DragAndDropWrapper;
@@ -30,6 +32,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.Command;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
@@ -37,28 +41,13 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import javax.servlet.annotation.WebServlet;
-
-import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
-
-
-	
 @Theme("dashboard")
 @SuppressWarnings("serial")
 public class AppUI extends UI {
 
-//	private CmisClient client;
 	private String user1;
 	private AlfrescoClient client;
-	
-//	public CmisClient getClient() {
-//		return client;
-//	}
-//
-//	public void setClient(CmisClient client) {
-//		this.client = client;
-//	}
-	
+
 	public AlfrescoClient getClient() {
 		return client;
 	}
@@ -82,7 +71,6 @@ public class AppUI extends UI {
 		{
 			put("/home", HomeView.class);
 			put("/search", SearchView.class);
-			put("/upload", UploadView.class);
 		}
 	};
 
@@ -104,14 +92,6 @@ public class AppUI extends UI {
 		if (exit) {
 			root.removeAllComponents();
 		}
-		//	        helpManager.closeAll();
-		//	        HelpOverlay w = helpManager
-		//	                .addOverlay(
-		//	                        "Welcome to the Dashboard Demo Application",
-		//	                        "<p>This application is not real, it only demonstrates an application built with the <a href=\"http://vaadin.com\">Vaadin framework</a>.</p><p>No username or password is required, just click the â€˜Sign Inâ€™ button to continue. You can try out a random username and password, though.</p>",
-		//	                        "login");
-		//	        w.center();
-		//	        addWindow(w);
 
 		addStyleName("login");
 
@@ -159,45 +139,45 @@ public class AppUI extends UI {
 		fields.addComponent(signin);
 		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
 
-		//	        final ShortcutListener enter = new ShortcutListener("Sign In",
-		//	                KeyCode.ENTER, null) {
-		//	            @Override
-		//	            public void handleAction(Object sender, Object target) {
-		//	                signin.click();
-		//	            }
-		//	        };
+		final ShortcutListener enter = new ShortcutListener("Sign In",
+				KeyCode.ENTER, null) {
+			@Override
+			public void handleAction(Object sender, Object target) {
+				signin.click();
+			}
+		};
 
 		signin.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-//				try {
+				try {
 					user1 = username.getValue();
 					String password1= password.getValue();
-//					client = new OpenCmisInMemoryClient(user1, password1);
 					client = new AlfrescoClient(user1, password1);
+					signin.removeShortcutListener(enter);
 					buildMainView(client);
-//				} catch(CmisBaseException e) {
-//					if (loginPanel.getComponentCount() > 2) {
-//						// Remove the previous error message
-//						loginPanel.removeComponent(loginPanel.getComponent(2));
-//					}
-//					// Add new error message
-//					Label error = new Label(
-//							"Wrong username or password. <span>Hint: try empty values</span>",
-//							ContentMode.HTML);
-//					error.addStyleName("error");
-//					error.setSizeUndefined();
-//					error.addStyleName("light");
-//					// Add animation
-//					error.addStyleName("v-animate-reveal");
-//					loginPanel.addComponent(error);
-//					username.focus();
-//				}
+				} catch(CmisBaseException e) {
+					if (loginPanel.getComponentCount() > 2) {
+						// Remove the previous error message
+						loginPanel.removeComponent(loginPanel.getComponent(2));
+					}
+					// Add new error message
+					Label error = new Label(
+							"Wrong username or password.",
+							ContentMode.HTML);
+					error.addStyleName("error");
+					error.setSizeUndefined();
+					error.addStyleName("light");
+					// Add animation
+					error.addStyleName("v-animate-reveal");
+					loginPanel.addComponent(error);
+					username.focus();
+				}
 
 			}
 		});
 
-		//	        signin.addShortcutListener(enter);
+		signin.addShortcutListener(enter);
 
 		loginPanel.addComponent(fields);
 
@@ -316,7 +296,7 @@ public class AppUI extends UI {
 
 		menu.removeAllComponents();
 
-		for (final String view : new String[] { "home", "search", "upload" }) {
+		for (final String view : new String[] { "home", "search"}) {
 			Button b = new NativeButton(view.substring(0, 1).toUpperCase()
 					+ view.substring(1).replace('-', ' '));
 			b.addStyleName("icon-" + view);
@@ -358,6 +338,7 @@ public class AppUI extends UI {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	private void clearMenuSelection() {
 		for (Iterator<Component> it = menu.getComponentIterator(); it.hasNext();) {
 			Component next = it.next();

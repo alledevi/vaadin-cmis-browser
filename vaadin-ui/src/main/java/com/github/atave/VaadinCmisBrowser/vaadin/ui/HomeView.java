@@ -5,6 +5,7 @@ import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
 import com.github.atave.VaadinCmisBrowser.vaadin.utils.DocumentUploader;
+import com.github.atave.VaadinCmisBrowser.vaadin.utils.StringUtils;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -20,8 +21,10 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.StartedEvent;
+
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 
 import java.util.ArrayList;
@@ -45,12 +48,12 @@ public class HomeView  extends VerticalLayout implements View  {
 	private TextField filter;
 
 	private HorizontalSplitPanel bottomLayout;
+	private TextField name;
+	private Window window;
+	private Button addFolder;
 
 	private TableComponent table;
 	private Tree tree;
-
-	private Object [] p={"image","name"};
-	private boolean [] o={true,true};
 
 	public HomeView() {
 
@@ -80,11 +83,8 @@ public class HomeView  extends VerticalLayout implements View  {
 		middleLayout.addStyleName("toolbar");
 		addComponent(middleLayout);
 
-
-
-
 		// ADD FOLDER
-		addFolderImage = new Image(null, new ThemeResource("img/arrow-up.png"));
+		addFolderImage = new Image(null, new ThemeResource("img/addfolder-icon.png"));
 		addFolderImage.setHeight("34px");
 		addFolderImage.setWidth("34px");
 		addFolderImage.addClickListener(addFolderListener);
@@ -100,7 +100,6 @@ public class HomeView  extends VerticalLayout implements View  {
 		middleLayout.setComponentAlignment(uploadImage, Alignment.MIDDLE_LEFT);
 
 		// SearchBar
-
 		filter = new TextField();
 		filter.setWidth("300px");
 		filter.focus();
@@ -129,8 +128,6 @@ public class HomeView  extends VerticalLayout implements View  {
 		table.setImmediate(true);
 		bottomLayout.setSecondComponent(table);
 
-		table.sort(p, o);
-
 		filter.addListener(new TextChangeListener() {
 			private static final long serialVersionUID = 1048639156493298177L;
 
@@ -144,22 +141,14 @@ public class HomeView  extends VerticalLayout implements View  {
 					f.removeContainerFilter(filterString);
 
 				// Set new filter for the "Name" column
-
 				filterString = new SimpleStringFilter("name", event.getText(),true, false);
 				f.addContainerFilter(filterString);
 			}
-
-
 		});
-
-
 	}
 
 	@Override
-	public void enter(ViewChangeEvent event) {
-		// TODO Auto-generated method stub
-
-	}
+	public void enter(ViewChangeEvent event) {}
 
 	public static void createTree(Tree tree, String parentId){	
 		Collection<FileView> currentFiles = client.getCurrentFolder().getChildren();
@@ -180,83 +169,101 @@ public class HomeView  extends VerticalLayout implements View  {
 
 
 	MouseEvents.ClickListener uploadListener = new MouseEvents.ClickListener() {
-
 		private static final long serialVersionUID = 1L;
+		private OptionGroup v;
 
 		public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
-			//create and add window
-			final Window window = new Window();
+
+			window = new Window("Select file to upload ");
+			window.setResizable(false);
 			window.center();
-			final VerticalLayout verticalLayout = new VerticalLayout();      
+			window.addStyleName("edit-dashboard");
 			UI.getCurrent().addWindow(window);
-			//create component
-			final Label state = new Label();
-			final Label fileName = new Label();
-			final Label textualProgress = new Label();
-			final ProgressIndicator pi = new ProgressIndicator();
-			final Button close = new Button("Finish");
-			
-			// find parameters
+
+			// find document to upload
 			FolderView folderView = client.getCurrentFolder();
 			final String path = folderView.getPath();
-			final DocumentUploader receiver = new DocumentUploader(client, path) {
-				
-				private static final long serialVersionUID = 1L;
-				
+
+			final DocumentUploader receiver = new DocumentUploader(client, path) {	
+				private static final long serialVersionUID = 1L;	
 				@Override
-				protected void onCmisUploadReceived(DocumentView documentView) {
-					// TODO Auto-generated method stub
-
-				}
-				
+				protected void onCmisUploadReceived(DocumentView documentView) {					
+				}				
 			};
-						
-			//upload component        
-			final Upload upload = new Upload("Select file to upload", receiver);
-			//!!!!!! very important
-			upload.setImmediate(false);
-			upload.setButtonCaption("Upload File");
+
+			// set background and information
+			VerticalLayout background = new VerticalLayout();		
+
+			FormLayout informationLayout = new FormLayout();
+			informationLayout.setSizeUndefined();
+			informationLayout.setMargin(true);
+
+			Upload upload = new Upload("", receiver);
+			upload.setImmediate(false);	
+			upload.setButtonCaption("Start upload");
 			upload.addSucceededListener(receiver);
-
-            verticalLayout.addComponent(upload);
-			verticalLayout.setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
-			verticalLayout.addComponent(new Label());	
-
-			//details
-			Panel p = new Panel("Status");
-			p.setSizeUndefined();
-			FormLayout l = new FormLayout();
-			l.setMargin(true);
-			p.setContent(l);
-			HorizontalLayout stateLayout = new HorizontalLayout();
-			stateLayout.setSpacing(true);
-			stateLayout.addComponent(state);
-			stateLayout.setCaption("Current state");
+			informationLayout.addComponent(upload);
+			
+			v = new OptionGroup("Select Version");
+			v.addItem("Minor");
+			v.addItem("Major");
+			v.setMultiSelect(false);
+			v.setImmediate(true);
+			informationLayout.addComponent(v);
+			
+			final Label state = new Label();
+			state.setCaption("Current state: ");
 			state.setValue("Idle");
-			l.addComponent(stateLayout);
-			fileName.setCaption("File name");
-			l.addComponent(fileName);
-			pi.setCaption("Progress");
-			pi.setVisible(false);
-			l.addComponent(pi);
-			textualProgress.setVisible(false);
-			l.addComponent(textualProgress);
+			informationLayout.addComponent(state);
+
+			final Label fileName = new Label();
+			fileName.setCaption("Upload file: ");
+			informationLayout.addComponent(fileName);
+
+			// progress bar
+			final ProgressIndicator progressBar = new ProgressIndicator();
+			progressBar.setCaption("Progress: ");
+			progressBar.setVisible(false);
+			informationLayout.addComponent(progressBar);
+
+			// textual progress
+			final Label textualProgress = new Label();
+			informationLayout.addComponent(textualProgress);
+
+			// close button
+			GridLayout gridLayout = new GridLayout(5,1);
+			gridLayout.setSizeFull();
+			gridLayout.setSpacing(true);
+			gridLayout.setMargin(true);
+			final Button close = new Button("Finish");
 			close.setVisible(false);
-			l.addComponent(close);
-			verticalLayout.addComponent(p);
-			verticalLayout.setComponentAlignment(p, Alignment.BOTTOM_CENTER);
+			close.addStyleName("default");
+			gridLayout.addComponent(close,2,0);
+
+			//set footer
+			HorizontalLayout footer = new HorizontalLayout();
+			footer.setMargin(true);
+			footer.setSpacing(true);
+			footer.addStyleName("footer");
+			footer.setWidth("100%");
+			footer.addComponent(gridLayout);
 			
 			upload.addListener(new Upload.StartedListener() {
 
 				private static final long serialVersionUID = 1L;
 
 				public void uploadStarted(final StartedEvent event) {
-                    if(client.exists(path, event.getFilename())){
-                        receiver.setVersioningState(VersioningState.MAJOR);
+					if(client.exists(path, event.getFilename())){
+						if(v.getValue().toString().equals("Minor")){
+							receiver.setVersioningState(VersioningState.MINOR);
+						}
+						else if(v.getValue().toString().equals("Major")){
+							receiver.setVersioningState(VersioningState.MAJOR);
+						}
 					}
-					pi.setValue(0f);
-					pi.setVisible(true);
-					pi.setPollingInterval(500); // hit server frequently to get
+					progressBar.setValue(0f);
+					progressBar.setVisible(true);
+					progressBar.setPollingInterval(500); // hit server frequently to get
 					textualProgress.setVisible(true);
 					// updates to client
 					state.setValue("Uploading");
@@ -270,7 +277,7 @@ public class HomeView  extends VerticalLayout implements View  {
 
 				public void updateProgress(long readBytes, long contentLength) {
 					// this method gets called several times during the update
-					pi.setValue(readBytes / (float) contentLength);
+					progressBar.setValue(readBytes / (float) contentLength);
 					textualProgress.setValue("Processed " + readBytes
 							+ " bytes of " + contentLength);
 				}
@@ -283,10 +290,8 @@ public class HomeView  extends VerticalLayout implements View  {
 
 				public void uploadFinished(FinishedEvent event) {
 					state.setValue("Idle");
-					pi.setVisible(false);
+					progressBar.setVisible(false);
 					textualProgress.setVisible(false);
-//					System.out.println("receiver name: "+ receiver.getFileName());
-//					System.out.println("receiver version: "+ receiver.getDocumentView().getVersionLabel());
 					table.populateTable(path);
 					close.setVisible(true);
 				}
@@ -298,31 +303,21 @@ public class HomeView  extends VerticalLayout implements View  {
 
 				@Override
 				public void buttonClick(ClickEvent event) {
-					// TODO Auto-generated method stub
 					window.close();
 				}
 			});
 
-			//			FinishedListener finishedListener = new FinishedListener() {			
-			//				@Override
-			//				public void uploadFinished(FinishedEvent event) {
-			//					// TODO Auto-generated method stub
-			//					table.populateTable(path);
-			//					window.close();
-			//				}
-			//			};
-			//			upload.addFinishedListener(finishedListener);
-
-
-			//set size
-			window.setHeight("300px");
-			window.setWidth("500px");
-			window.setContent(verticalLayout);
+			// add all layouts to background
+			background.addComponent(informationLayout);
+			background.addComponent(footer);
+			window.setContent(background);	
 
 		}
 	};
 
 	ValueChangeListener versionListener = new ValueChangeListener() {
+
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void valueChange(ValueChangeEvent event) {
@@ -338,70 +333,121 @@ public class HomeView  extends VerticalLayout implements View  {
 
 		@Override
 		public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
-			// TODO Auto-generated method stub
-			String path = client.getCurrentFolder().getPath();
-			client.createFolder(path, "New folder");
-			table.populateTable(path);
+			window = new Window("Add new folder");
+			window.setResizable(false);
+			window.center();
+			window.addStyleName("edit-dashboard");
+			UI.getCurrent().addWindow(window);
 
-		}};
+			VerticalLayout background = new VerticalLayout();		
 
+			FormLayout informationLayout = new FormLayout();
+			informationLayout.setSizeUndefined();
+			informationLayout.setMargin(true);
+			name = new TextField("Name");
+			name.setRequired(true);
+			name.setSizeFull();
+			informationLayout.addComponent(name);
+			TextArea description = new TextArea("Description");
+			description.setSizeFull();
+			informationLayout.addComponent(description);
 
-		// popola tabella + tree
-		ItemClickListener treeListener = new ItemClickEvent.ItemClickListener() {
+			GridLayout gridLayout = new GridLayout(5,1);
+			gridLayout.setSpacing(true);
+			gridLayout.setMargin(true);
+			addFolder = new Button("Add");
+			addFolder.addClickListener(nameListener);
+			addFolder.addStyleName("default");
+			Button close = new Button("Close");
+			close.addClickListener(nameListener);
+			close.addStyleName("default");
+			gridLayout.addComponent(addFolder,1,0,2,0);
+			gridLayout.addComponent(close,3,0,4,0);
 
-			private static final long serialVersionUID = 1L;
-			List<String> itemExpanded = new ArrayList<>();
-			String itemId = null;
-			String path = null;
+			HorizontalLayout footer = new HorizontalLayout();
+			footer.setMargin(true);
+			footer.setSpacing(true);
+			footer.addStyleName("footer");
+			footer.setWidth("100%");
+			footer.addComponent(gridLayout);		
 
-
-			public void itemClick(ItemClickEvent event) {
-				// Pick only left mouse clicks
-				itemId = (String) event.getItemId();
-				if (event.getButton() == ItemClickEvent.BUTTON_LEFT){
-					path = getTreePath(tree, itemId);
-					//update folderComponent + tree
-					table.populateTable(path);
-					createTree(tree, itemId);
-					if(itemExpanded.contains(itemId)){
-						//if expanded, collapse
-						tree.collapseItem(itemId);
-						itemExpanded.remove(itemId);
-					}else{
-						tree.expandItem(itemId);
-						itemExpanded.add(itemId);
-					}				
-				}
-			}
-		};
-
-		//		private boolean filterByProperty(String prop, Item item, String text) {
-		//			if (item == null || item.getItemProperty(prop) == null
-		//					|| item.getItemProperty(prop).getValue() == null)
-		//				return false;
-		//			String val = item.getItemProperty(prop).getValue().toString().trim()
-		//					.toLowerCase();
-		//			if (val.startsWith(text.toLowerCase().trim()))
-		//				return true;
-		//			// String[] parts = text.split(" ");
-		//			// for (String part : parts) {
-		//			// if (val.contains(part.toLowerCase()))
-		//			// return true;
-		//			//
-		//			// }
-		//			return false;
-		//		}
-
-		public static String getTreePath(Tree tree, String itemId){
-			//return path of folder selected
-			if(itemId.equals("Repository")){
-				return "/";
-			}		
-			String path = "/" + itemId;
-			while(!tree.getParent(itemId).equals("Repository") && tree.getParent(itemId) != null ){
-				itemId = (String) tree.getParent(itemId);
-				path = "/" + itemId +  path;
-			}		
-			return path;
+			background.addComponent(informationLayout);
+			background.addComponent(footer);
+			window.setContent(background); 
 		}
+	};
+
+	ClickListener nameListener = new ClickListener(){
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void buttonClick(ClickEvent event) {
+			
+			window.close();
+			
+			if(!name.getValue().equals(null) && event.getButton() == addFolder){
+				FolderView newFolder = null;
+				String path = client.getCurrentFolder().getPath();
+				
+				if(!client.exists(path + name.getValue())){
+					newFolder = client.createFolder(path, name.getValue());			
+				} else {
+					String regexName = name.getValue();
+					do {
+						regexName = StringUtils.renameFolder(regexName);
+					} while(client.exists(path + regexName));	
+					
+					newFolder = client.createFolder(path, regexName);
+				}		
+				table.addItemToFolderComponent(newFolder.getPath());
+			}
+			
+		}
+	};
+
+
+	// popola tabella + tree
+	ItemClickListener treeListener = new ItemClickEvent.ItemClickListener() {
+
+		private static final long serialVersionUID = 1L;
+		List<String> itemExpanded = new ArrayList<>();
+		String itemId = null;
+		String path = null;
+
+
+		public void itemClick(ItemClickEvent event) {
+			// Pick only left mouse clicks
+			itemId = (String) event.getItemId();
+			if (event.getButton() == ItemClickEvent.BUTTON_LEFT){
+				path = getTreePath(tree, itemId);
+				//update folderComponent + tree
+				table.populateTable(path);
+				createTree(tree, itemId);
+				if(itemExpanded.contains(itemId)){
+					//if expanded, collapse
+					tree.collapseItem(itemId);
+					itemExpanded.remove(itemId);
+				}else{
+					tree.expandItem(itemId);
+					itemExpanded.add(itemId);
+				}				
+			}
+		}
+	};
+
+
+
+	public static String getTreePath(Tree tree, String itemId){
+		//return path of folder selected
+		if(itemId.equals("Repository")){
+			return "/";
+		}		
+		String path = "/" + itemId;
+		while(!tree.getParent(itemId).equals("Repository") && tree.getParent(itemId) != null ){
+			itemId = (String) tree.getParent(itemId);
+			path = "/" + itemId +  path;
+		}		
+		return path;
+	}
+
 }

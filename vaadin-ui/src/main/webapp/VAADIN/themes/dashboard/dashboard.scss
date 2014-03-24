@@ -506,7 +506,7 @@
 	
 		.v-window-header {
 			font-weight: normal;
-			overflow: visible;
+			overflow: visible;    
 		}
 	
 		.v-window-footer {
@@ -691,14 +691,38 @@
 	
 	.v-formlayout-captioncell {
 		vertical-align: top;
-	}
+	}     
 	
 	.edit-dashboard .v-formlayout {
-		padding: 10px 8px;
+		padding: 10px 8px;  
 		
 		.v-formlayout-captioncell {
 			vertical-align: middle;
+      horizontal-align: middle;
 		}
 	}
-
+  
+  .edit-dashboard .v-gridlayout {
+		padding: 0px 100px 0px 100px;  
+		
+	}
+  
+  .v-upload {     
+      height: 100px;     
+      
+    .gwt-FileUpload {
+        border: 1px solid #ddd;
+    }
+    
+    .v-button { 
+      position: relative;
+		  top: 50px;
+		  left: -170px;
+      
+      }
+    .v-button-wrap {}
+    .v-button-caption {}
+   }
+  
 }
+  

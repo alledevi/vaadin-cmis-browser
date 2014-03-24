@@ -1,13 +1,19 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
+import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
+import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
 import com.github.atave.VaadinCmisBrowser.vaadin.utils.DocumentDownloader;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.MouseEvents.ClickListener;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
@@ -15,22 +21,27 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 public class TableActionComponent extends CustomComponent {
+	
 	private static final long serialVersionUID = 1L;
+	
 	Button yes, no;
 	Table table;
-	CmisClient client;
+	AlfrescoClient client;
 	Boolean isFolder;
 	Integer itemId;
 	String path;
@@ -38,54 +49,75 @@ public class TableActionComponent extends CustomComponent {
 	Panel queryPanel;
 	String requestedVersion;
 	Link downloadLink = new Link();
+	Table tableTag;
+	Integer i=0;
+	Image removeTag;
 
-	public TableActionComponent(final String path, final Integer itemId , final Table table, final CmisClient client, final Boolean isFolder) {
+	public TableActionComponent(final String path, final Integer itemId , final Table table, final AlfrescoClient client, final Boolean isFolder) {
 		this.table = table;
 		this.client = client;
 		this.isFolder = isFolder;
 		this.itemId = itemId;
 		this.path = path;
-	
+
 
 		// A layout structure used for composition
 		Panel panel = new Panel();
 		//which rows it refers to 
 		panel.setData(itemId);
-		HorizontalLayout layout = new HorizontalLayout();
-		panel.setContent(layout);
+		HorizontalLayout layoutFolder = new HorizontalLayout();
+		HorizontalLayout layoutDocument = new HorizontalLayout();
+		
 
 		//button for delete document
 		Image deleteDocument = new Image(null, new ThemeResource(
 				"img/delete-icon.png"));
 		deleteDocument.setHeight("34px");
 		deleteDocument.setWidth("34px");
-		queryPanel = new Panel();
-		HorizontalLayout horizontalLayout = new HorizontalLayout();
-		yes = new Button("yes");
-		no = new Button("no");
-		yes.addClickListener(buttonListener);
-		no.addClickListener(buttonListener);
-		horizontalLayout.addComponent(yes);
-		horizontalLayout.setComponentAlignment(yes, Alignment.MIDDLE_LEFT);
-		horizontalLayout.addComponent(no);
-		horizontalLayout.setComponentAlignment(no, Alignment.MIDDLE_RIGHT);
-		queryPanel.setContent(horizontalLayout);
 
 		ClickListener deleteDocumentListener = new ClickListener() {
+
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
-				//create and add window
-				window = new Window();
+				window = new Window("Delete. Are you sure? ");
+				window.setResizable(false);
 				window.center();
-				final VerticalLayout verticalLayout = new VerticalLayout();      
+				window.addStyleName("edit-dashboard");
 				UI.getCurrent().addWindow(window);
-				Label question = new Label("Delete: Are you sure?");
-				verticalLayout.addComponent(question);
-				verticalLayout.addComponent(queryPanel);
-				verticalLayout.setComponentAlignment(queryPanel, Alignment.BOTTOM_CENTER);
-				window.setHeight("150px");
-				window.setWidth("500px");
-				window.setContent(verticalLayout);
+				
+				VerticalLayout background = new VerticalLayout();		
+				
+				FormLayout informationLayout = new FormLayout();
+				informationLayout.setSizeUndefined();
+				informationLayout.setMargin(true);
+								
+				GridLayout gridLayout = new GridLayout(5,1);
+				gridLayout.setSizeFull();
+				gridLayout.setSpacing(true);
+				gridLayout.setMargin(true);
+
+				yes = new Button("yes");
+				yes.addStyleName("default");
+				no = new Button("no");
+				no.addStyleName("default");
+				yes.addClickListener(deleteDocumentButtonListener);
+				no.addClickListener(deleteDocumentButtonListener);
+				gridLayout.addComponent(yes,1,0,2,0);
+				gridLayout.addComponent(no,3,0,4,0);				
+				informationLayout.addComponent(gridLayout);
+				
+				//set footer
+				HorizontalLayout footer = new HorizontalLayout();
+				footer.setMargin(true);
+                footer.setSpacing(true);
+                footer.addStyleName("footer");
+                footer.setWidth("100%");
+				
+                background.addComponent(informationLayout);
+				background.addComponent(footer);
+				window.setContent(background);	
 			}
 		};
 		deleteDocument.addClickListener(deleteDocumentListener);
@@ -95,91 +127,251 @@ public class TableActionComponent extends CustomComponent {
 				"img/download-icon.png"));
 		documentDownload.setHeight("34px");
 		documentDownload.setWidth("34px");
-		
+
 		ClickListener documentDownloadListener = new ClickListener() {
+
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
-				window = new Window();
+				window = new Window("Select version: ");
+				window.setResizable(false);
 				window.center();
-				final VerticalLayout verticalLayout = new VerticalLayout();      
-				UI.getCurrent().addWindow(window);
-				//get document
+				window.addStyleName("edit-dashboard");
+				UI.getCurrent().addWindow(window);	
+				
+				VerticalLayout background = new VerticalLayout();		
+				
+				FormLayout informationLayout = new FormLayout();
+				informationLayout.setSizeUndefined();
+				informationLayout.setMargin(true);
+
 				DocumentView document = client.getDocument(path);	
-				ComboBox versions = new ComboBox("Select version: ");
+				ComboBox versions = new ComboBox();
 				versions.setImmediate(true);
+				versions.addValueChangeListener(versionListener);
 				for(String version : document.getAllVersions()){
 					versions.addItem(version);
 				}
+				informationLayout.addComponent(versions);				
 				
-				versions.addValueChangeListener(versionListener);				
-				verticalLayout.addComponent(versions);
 				downloadLink.setCaption("Start download");
 				downloadLink.setEnabled(false);
-				verticalLayout.addComponent(downloadLink);		
-				window.setHeight("150px");
-				window.setWidth("500px");
-				window.setContent(verticalLayout);			
+				informationLayout.addComponent(downloadLink);		
+
+				//set footer
+				HorizontalLayout footer = new HorizontalLayout();
+				footer.setMargin(true);
+                footer.setSpacing(true);
+                footer.addStyleName("footer");
+                footer.setWidth("100%");
+				
+                background.addComponent(informationLayout);
+				background.addComponent(footer);
+				window.setContent(background);			
 			}
 		};
 		documentDownload.addClickListener(documentDownloadListener);
 
 		//button for more information
-		Image moreInformation = new Image(null, new ThemeResource(
-				"img/info-icon.png"));
+		Image moreInformation = new Image(null, new ThemeResource("img/info-icon.png"));
 		moreInformation.setHeight("34px");
 		moreInformation.setWidth("34px");
+		
+		//open window for more information
 		ClickListener moreInformationListener = new ClickListener() {
-			@Override
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("deprecation")
 			public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
-				Item item = table.getItem(itemId);
-				Label createdBy = new Label("created by: " + (String) table.getContainerProperty(itemId, "created by").getValue());
-				Label modifiedBy = new Label("modified by: " + (String) table.getContainerProperty(itemId, "modified by").getValue());
-				Label path = new Label("path: " + (String) table.getContainerProperty(itemId, "path").getValue());
 				
-				window = new Window();
+				window = new Window("More information");
+				window.setResizable(false);
 				window.center();
-				final VerticalLayout verticalLayout = new VerticalLayout();      
-				UI.getCurrent().addWindow(window);
-				Label title = new Label("More information");
-				title.setHeight("10px");
-				verticalLayout.addComponent(title);		
-				verticalLayout.setComponentAlignment(title, Alignment.TOP_CENTER);
-				verticalLayout.addComponent(createdBy);
-				verticalLayout.addComponent(modifiedBy);
-				verticalLayout.addComponent(path);
+				window.addStyleName("edit-dashboard");
+				UI.getCurrent().addWindow(window);	
 				
-				window.setHeight("150px");
-				window.setWidth("500px");
-				window.setContent(verticalLayout);
+				VerticalLayout background = new VerticalLayout();
+				
+				//general information
+				FormLayout informationLayout = new FormLayout();
+				informationLayout.setSizeUndefined();
+				informationLayout.setMargin(true);
+				Label createdBy = new Label("created by: " + (String) table.getContainerProperty(itemId, "created by").getValue());
+				informationLayout.addComponent(createdBy);
+				Label modifiedBy = new Label("modified by: " + (String) table.getContainerProperty(itemId, "modified by").getValue());
+				informationLayout.addComponent(modifiedBy);
+				Label path1 = new Label("path: " + (String) table.getContainerProperty(itemId, "path").getValue());
+				informationLayout.addComponent(path1);
+				
+				//panel for add tag
+				HorizontalLayout tagLayout = new HorizontalLayout();
+				tagLayout.setMargin(false);
+				tagLayout.setSpacing(true);
+				tagLayout.setWidth("100%");
+				Label tag = new Label("Tag: ");
+				tagLayout.addComponent(tag);
+				final TextField tf = new TextField();
+				tf.setInputPrompt("Add new tag");
+				tagLayout.addComponent(tf);
+				final Button add = new Button("Add");
+				add.addStyleName("default");
+				tagLayout.addComponent(add);	
+				informationLayout.addComponent(tagLayout);
+				
+				//table with tag
+				tableTag = new Table();
+				tableTag.setSelectable(false);
+				tableTag.setImmediate(true);
+				tableTag.addContainerProperty("name", String.class, null);
+				tableTag.addContainerProperty("image", Image.class, null);
+				tableTag.setColumnAlignment("image", Align.CENTER);
+				tableTag.setColumnAlignment("name", Align.CENTER);
+				tableTag.setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
+				tableTag.setWidth("100%");
+				tableTag.addStyleName("borderless");
+				tableTag.setPageLength(5);
+				informationLayout.addComponent(tableTag);
+				
+				//button for remove tag
+				removeTag = new Image(null, new ThemeResource("img/remove.png"));
+				removeTag.addClickListener(removeTagListener);
+
+				// find tag and populate table
+				ArrayList<String> tags = new ArrayList<String>();		
+				try {
+					FileView file = client.getFile(path);
+					if(file.isDocument()){
+						tags = (ArrayList<String>) client.getTags(client.getDocument(path).getId());
+					}
+					else if(file.isFolder()){
+						tags = (ArrayList<String>) client.getTags(client.getFolder(path).getId());
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+				for(String t : tags){
+					removeTag = new Image(t, new ThemeResource("img/remove.png"));
+					removeTag.addClickListener(removeTagListener);
+					removeTag.setData(i);
+					tableTag.addItem(new Object[] {t, removeTag},i++);
+				}
+				
+				// shortcut for add tag
+				final ShortcutListener enter = new ShortcutListener("", KeyCode.ENTER, null) {
+							private static final long serialVersionUID = 1L;
+					@Override
+					public void handleAction(Object sender, Object target) {
+						add.click();
+					}
+				};
+				
+				add.addClickListener(new Button.ClickListener() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void buttonClick(ClickEvent event) {
+						if(!tf.getValue().equals("")){
+						removeTag = new Image(tf.getValue(), new ThemeResource("img/remove.png"));
+						removeTag.addClickListener(removeTagListener);
+						removeTag.setData(i);
+						tableTag.addItem(new Object[] {tf.getValue(), removeTag},i++);		
+						try {
+							client.createTag(tf.getValue());
+							FileView file = client.getFile(path);
+							String id = null;
+							if(file.isDocument()){
+								DocumentView document = client.getDocument(path);
+								id = document.getId();
+							}
+							else if(file.isFolder()){
+								FolderView folder = client.getFolder(path);
+								id = folder.getId();
+							}
+						
+							client.addTags(id, Collections.singleton(tf.getValue()));
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						}
+					}
+				});
+
+				add.addShortcutListener(enter);
+				
+				//set footer
+				HorizontalLayout footer = new HorizontalLayout();
+				footer.setMargin(true);
+                footer.setSpacing(true);
+                footer.addStyleName("footer");
+                footer.setWidth("100%");
+				
+                background.addComponent(informationLayout);
+				background.addComponent(footer);
+				window.setContent(background);
+
 			}
 		};
 		moreInformation.addClickListener(moreInformationListener);
 
 
-		panel.addClickListener(panelListener);
-		layout.addComponent(deleteDocument);
-		layout.setComponentAlignment(deleteDocument, Alignment.BOTTOM_LEFT);
-		layout.addComponent(documentDownload);
-		layout.setComponentAlignment(documentDownload, Alignment.MIDDLE_CENTER);
-		layout.addComponent(moreInformation);
-		layout.setComponentAlignment(moreInformation, Alignment.MIDDLE_RIGHT);
+		panel.addClickListener(selectPanelListener);
+		if(isFolder){
+			panel.setContent(layoutFolder);
+			layoutFolder.addComponent(deleteDocument);
+			layoutFolder.setComponentAlignment(deleteDocument, Alignment.BOTTOM_LEFT);
+			layoutFolder.addComponent(moreInformation);
+			layoutFolder.setComponentAlignment(moreInformation, Alignment.MIDDLE_CENTER);
+		}
+		else{
+			panel.setContent(layoutDocument);
+			layoutDocument.addComponent(deleteDocument);
+			layoutDocument.setComponentAlignment(deleteDocument, Alignment.BOTTOM_LEFT);
+			layoutDocument.addComponent(documentDownload);
+			layoutDocument.setComponentAlignment(documentDownload, Alignment.MIDDLE_CENTER);
+			layoutDocument.addComponent(moreInformation);
+			layoutDocument.setComponentAlignment(moreInformation, Alignment.MIDDLE_RIGHT);
+			
+		}
+		
 		setCompositionRoot(panel);
 
 	}
+	
+	ClickListener removeTagListener = new ClickListener() {
 
-	ClickListener panelListener = new ClickListener() {
+		private static final long serialVersionUID = 1L;
+
 		//select table row
 		public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
-			Integer id = (Integer)((Panel) event.getComponent()).getData();
-			table.select(id);
+			try {
+				Integer id = (Integer)((Image) event.getComponent()).getData();
+				String tag = event.getComponent().getCaption().toString();
+				System.out.println(tag);
+				client.deleteTag(tag);
+				tableTag.removeItem(id);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 		}
 	};
 
-	Button.ClickListener buttonListener = new Button.ClickListener() {
+	//lister for highlight row
+		ClickListener selectPanelListener = new ClickListener() {
+			private static final long serialVersionUID = 1L;
 
-		@Override
+			//select table row
+			public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
+				Integer id = (Integer)((Panel) event.getComponent()).getData();
+				table.select(id);
+			}
+		};
+	Button.ClickListener deleteDocumentButtonListener = new Button.ClickListener() {
+		private static final long serialVersionUID = 1L;
+
 		public void buttonClick(ClickEvent event) {
-			// TODO Auto-generated method stub
 			if(event.getButton().equals(yes)){
 				// Delete all versions of a document			
 				if (isFolder){
@@ -191,13 +383,15 @@ public class TableActionComponent extends CustomComponent {
 				}
 				table.removeItem(itemId);
 			}	
-
 			window.close();
 		}
 	};
 	
+	
+	//select which version download
 	ValueChangeListener versionListener = new ValueChangeListener() {
-		@Override
+		private static final long serialVersionUID = 1L;
+
 		public void valueChange(ValueChangeEvent event) {
 			requestedVersion = event.getProperty().getValue().toString();
 			

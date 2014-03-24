@@ -1,8 +1,8 @@
 @mixin dashboard-window {
 	
 	.v-window {
-		@include fade-in;
-		@include box-shadow(0 4px 20px rgba(0,0,0,.5));
+		@include fade-in;       
+		@include box-shadow(0 4px 20px rgba(0,0,0,.5));   
 	}
 	
 	.v-shadow-window {
@@ -23,11 +23,11 @@
 		color: #ddd;
 		font-size: 16px;
 		font-weight: normal;
-		line-height: 20px;
+		line-height: 20px;  
 		text-align: center;
 		width: 20px;
 		height: 20px;
-		@include border-radius(2px);
+		@include border-radius(2px);    
 		top: 10px;
 		right: 10px;
 	}
@@ -57,14 +57,25 @@
 	}
 	
 	.v-window-outerheader {
-		padding: 0.5em 20px;
-		height: 1.7em;
+    background: #eee;
+		padding: 10px 0px 0px 0px;
+		height: 40px;
 		font-weight: 300;
-		font-size: 20px;
+		font-size: 20px; 
+    
 	}
 	
-	.v-window-header {
-		font-weight: inherit;
+	.v-window-header { 
+      background: #eee;
+		  border-bottom: 1px solid #e0e0e0;
+
+  		/*width: 400px;*/
+		  height: 40px;
+      font-weight: 400;   
+      font-size: 20px;
+      
+      text-align: center;
+      color: ##404346;
 	}
 	
 	.dialog.v-window {
@@ -81,6 +92,7 @@
 	
 	.v-window .footer {
 		background: #eee;
+    height: 50px;
 		border-top: 1px solid #e0e0e0;
 	}
 

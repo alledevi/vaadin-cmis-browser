@@ -11,7 +11,8 @@ import java.io.InputStream;
  */
 public class DocumentDownloader implements StreamResource.StreamSource {
 
-    private DocumentView document;
+	private static final long serialVersionUID = 1L;
+	private DocumentView document;
 
     /**
      * Constructs a {@code DocumentDownloader}.
