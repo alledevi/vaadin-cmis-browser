@@ -91,9 +91,20 @@
 	}
 	
 	.v-window .footer {
-      background: #eee;
-      height: 50px;
-      border-top: 1px solid #e0e0e0;
+		background: #eee;
+    height: 50px;
+		border-top: 1px solid #e0e0e0;
+	}
+	
+	.v-window .v-textarea{
+	@include border-radius(4px);
+		border: 1px solid #c9c8c7;
+		border-top-color: #d8d7d6;
+		box-shadow: 0 0 0 2px rgba(51,50,49,.07);
+	}
+	
+	.v-window .upload-layout {
+		padding: 20px 40px 0px 40px;
 	}
 
 }

@@ -206,5 +206,9 @@
 	.v-table.plain .v-table-caption-container {
 		border-left-color: transparent;
 	}
-
+	
+	.v-table-column-selector{
+		height: 0px;
+		width: 0px;
+	}
 }
