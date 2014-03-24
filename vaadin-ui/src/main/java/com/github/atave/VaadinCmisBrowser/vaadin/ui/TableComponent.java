@@ -1,7 +1,5 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import java.sql.Timestamp;
-import java.util.Collection;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
@@ -12,13 +10,13 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Table.Align;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.VerticalLayout;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
+
+import java.sql.Timestamp;
+import java.util.Collection;
 
 public class TableComponent extends CustomComponent {
 
@@ -299,45 +297,44 @@ public class TableComponent extends CustomComponent {
 		}
 	}
 
-	public void addItemToFolderComponent(String fileId){
-		FileView file = client.getFile(fileId);
+    public void addItemToFolderComponent(String idOrPath) {
+        FileView file = client.getFile(idOrPath);
+        addItemToFolderComponent(file);
+    }
+
+	public void addItemToFolderComponent(FileView file){
+        // Globally filter files shown
+        String path = file.getPath();
+        String objectTypeId = file.getProperty(PropertyIds.OBJECT_TYPE_ID);
+        if (path == null || !objectTypeId.equals(BaseTypeId.CMIS_DOCUMENT.value())) {
+            return;
+        }
+
+        // Add the file
 		long creationDateMillis = file.getCreationDate().getTimeInMillis();
 		Timestamp creationDate = new Timestamp(creationDateMillis);
+
 		long modificationDateMillis = file.getLastModificationDate().getTimeInMillis();
 		Timestamp modificationDate = new Timestamp(modificationDateMillis);
-		int i = table.size() +1;
-		table.setImmediate(true);
-		if (file.isFolder()){
-			table.addItem(
-					new Object[] {
-							getFolderIcon(true, file.getId(), i),
-							file.getName(),
-							file.getDescription(),
-							creationDate,
-							modificationDate,
-							file.getCreatedBy(),
-							file.getLastModifiedBy(),
-							file.getPath(),
-							0,
-							new TableActionComponent(file.getPath(), i, table, client, true)},
-							i);
-		} else {
-			table.addItem(
-					new Object[] {
-							getFolderIcon(false, file.getId(), i),
-							file.getName(),
-							file.getDescription(),
-							creationDate,
-							modificationDate,
-							file.getCreatedBy(),
-							file.getLastModifiedBy(), 
-							file.getPath(),
-							1,
-							new TableActionComponent(file.getPath(), i, table, client, false)},
-							i);
 
-		}
-	}
+		int i = table.size() +1;
+        table.setImmediate(true);
+
+        boolean isFolder = file.isFolder();
+
+        table.addItem(new Object[] {
+                getFolderIcon(isFolder, file.getId(), i),
+                file.getName(),
+                file.getDescription(),
+                creationDate,
+                modificationDate,
+                file.getCreatedBy(),
+                file.getLastModifiedBy(),
+                file.getPath(),
+                isFolder ? 0 : 1,
+                new TableActionComponent(file.getPath(), i, table, client, isFolder)
+        }, i);
+    }
 
 	public static String getParentFolder(String path){
 		String name = null;

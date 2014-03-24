@@ -399,7 +399,7 @@ public class HomeView  extends VerticalLayout implements View  {
 					
 					newFolder = client.createFolder(path, regexName);
 				}		
-				table.addItemToFolderComponent(newFolder.getPath());
+				table.addItemToFolderComponent(newFolder);
 			}
 			
 		}

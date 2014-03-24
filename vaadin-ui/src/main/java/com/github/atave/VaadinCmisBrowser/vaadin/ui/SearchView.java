@@ -180,9 +180,7 @@ public class SearchView extends VerticalLayout implements View  {
                     results = client.search(nameDocument, textDocument, matchers);
 
 					for(DocumentView document : results) {
-						if (document.getPath() != null) {
-							table.addItemToFolderComponent(document.getPath());
-						}
+                        table.addItemToFolderComponent(document);
 					}
 				}
             }
