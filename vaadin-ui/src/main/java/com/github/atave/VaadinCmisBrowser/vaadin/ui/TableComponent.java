@@ -306,8 +306,10 @@ public class TableComponent extends CustomComponent {
         // Globally filter files shown
         String path = file.getPath();
         String objectTypeId = file.getProperty(PropertyIds.OBJECT_TYPE_ID);
-        if (path == null || !objectTypeId.equals(BaseTypeId.CMIS_DOCUMENT.value())) {
-            return;
+        boolean isFolder = file.isFolder();
+
+        if (path == null || !(isFolder || objectTypeId.equals(BaseTypeId.CMIS_DOCUMENT.value()))) {
+                return;
         }
 
         // Add the file
@@ -319,8 +321,6 @@ public class TableComponent extends CustomComponent {
 
 		int i = table.size() +1;
         table.setImmediate(true);
-
-        boolean isFolder = file.isFolder();
 
         table.addItem(new Object[] {
                 getFolderIcon(isFolder, file.getId(), i),
