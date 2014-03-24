@@ -1,12 +1,5 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyMatcher;
 import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyType;
@@ -15,18 +8,13 @@ import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
+import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SearchView extends VerticalLayout implements View  {
 
@@ -153,8 +141,7 @@ public class SearchView extends VerticalLayout implements View  {
 
 				// da aggiungere: eccezione name e text entrambi nulli e Autore creazione??				
 				Collection<PropertyMatcher> matchers = new ArrayList<>();
-				PropertyMatcher matcherTag;
-				ItemIterable<DocumentView> results;
+                ItemIterable<DocumentView> results;
 
 				String nameDocument = name.getValue();
 				String textDocument = text.getValue();
@@ -166,57 +153,39 @@ public class SearchView extends VerticalLayout implements View  {
 					textDocument = null;	
 
 				if(!description.getValue().equals(""))
-					matchers.add(new PropertyMatcher("cmis:description", QueryOperator.LIKE, PropertyType.STRING, description.getValue()));
+					matchers.add(new PropertyMatcher(PropertyIds.DESCRIPTION, QueryOperator.LIKE, PropertyType.STRING, description.getValue()));
 
 				if(!mod.getValue().equals(""))
-					matchers.add(new PropertyMatcher("cmis:lastModifiedBy", QueryOperator.EQUALS, PropertyType.STRING, mod.getValue()));
+					matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFIED_BY, QueryOperator.EQUALS, PropertyType.STRING, mod.getValue()));
 
 				if(fromDate.getValue() != null)
-					matchers.add(new PropertyMatcher("cmis:lastModificationDate", QueryOperator.GREATER_THAN, PropertyType.DATETIME, new Date(2014, 03, 15)));
+					matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.GREATER_THAN_OR_EQUALS, PropertyType.DATETIME, fromDate.getValue()));
 
 				if(toDate.getValue() != null)
-					matchers.add(new PropertyMatcher("cmis:lastModificationDate", QueryOperator.LESS_THAN, PropertyType.DATETIME, new Date(2014, 03, 17)));
+					matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.LESS_THAN_OR_EQUALS, PropertyType.DATETIME, toDate.getValue()));
+
+                if(!keyWords.getValue().equals("")) {
+                    matchers.add(new AlfrescoClient.TagMatcher(keyWords.getValue().split("\\s+")));
+                }
 
 				if(keyWords.getValue().equals("") && nameDocument == null && 
 						textDocument == null && matchers.isEmpty()){
 					 Notification.show("Error!","Inserire almeno un valore", Notification.TYPE_TRAY_NOTIFICATION);
 
-				}
-					
-				else{
+				} else {
 					table.clearTable();
 					panel.setVisible(false);
 					resultLayout.setVisible(true);
 
-					// Search for documents by tags
-					if(!keyWords.getValue().equals("")){
-						matcherTag = new AlfrescoClient.TagMatcher(keyWords.getValue());
-						results = client.search(null, null, Collections.singleton(matcherTag));
-
-					}
-					else{
-
-						// Search all documents
-						if(matchers.isEmpty()){
-							results = client.search(nameDocument,textDocument);
-						}
-						else{
-							results = client.search(nameDocument,textDocument,matchers);
-
-						}
-					}
+                    results = client.search(nameDocument, textDocument, matchers);
 
 					for(DocumentView document : results) {
 						if (document.getPath() != null) {
 							table.addItemToFolderComponent(document.getPath());
 						}
 					}
-
-					matchers.removeAll(matchers);
-
 				}
-				//	matchers.add(new PropertyMatcher("cmis:createdBy", QueryOperator.EQUALS, PropertyType.STRING, "userA"));
-			}
+            }
 
 			// returnButton
 			else if(event.getButton().equals(returnButton)){
