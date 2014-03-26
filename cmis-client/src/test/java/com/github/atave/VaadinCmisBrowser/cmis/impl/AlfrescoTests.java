@@ -262,8 +262,7 @@ public class AlfrescoTests {
         Assert.assertEquals(2, results.getTotalNumItems());
 
         results = client.search(null, null, getMatchers("tagA", "tagB"));
-        Assert.assertEquals(1, results.getTotalNumItems());
-        Assert.assertEquals(files[0], results.iterator().next().getName());
+        Assert.assertEquals(3, results.getTotalNumItems());
 
         results = client.search(files[1], null, null);
         Assert.assertEquals(1, results.getTotalNumItems());

@@ -288,7 +288,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
                             if (ids == null) {
                                 ids = currentIds;
                             } else {
-                                ids.retainAll(currentIds);
+                                ids.addAll(currentIds);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
