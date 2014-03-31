@@ -268,6 +268,9 @@ public class AlfrescoTests {
         Assert.assertEquals(1, results.getTotalNumItems());
         Assert.assertEquals(files[1], results.iterator().next().getName());
 
+        results = client.search(null, null, getMatchers("nonexistenttag"));
+        Assert.assertEquals(0, results.getTotalNumItems());
+
         // Cleanup
         for (int i = 0; i < files.length; ++i) {
             for (String tag : newTags[i]) {

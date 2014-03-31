@@ -7,6 +7,7 @@ import com.github.atave.junderscore.Lambda1;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
+import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.impl.json.JSONArray;
@@ -300,6 +301,10 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
             }
 
             if (ids != null) {
+                if (ids.isEmpty()) {
+                    return new EmptyItemIterable<>();
+                }
+
                 PropertyMatcher matcher = new PropertyMatcher(
                         PropertyIds.OBJECT_ID,
                         QueryOperator.IN,
