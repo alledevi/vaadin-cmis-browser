@@ -1,12 +1,10 @@
 package com.github.atave.VaadinCmisBrowser.cmis.api;
 
-import com.github.atave.junderscore.Lambda1;
 import org.apache.chemistry.opencmis.client.api.Document;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-
-import static com.github.atave.junderscore.JUnderscore._;
 
 
 /**
@@ -35,12 +33,13 @@ public class DocumentView extends FileView {
      * Fetches all versions of this document.
      */
     public Collection<String> getAllVersions() {
-        return _(getDelegate().getAllVersions()).map(new Lambda1<String, Document>() {
-            @Override
-            public String call(Document o) {
-                return o.getVersionLabel();
-            }
-        });
+        Collection<String> versions = new ArrayList<>();
+
+        for (Document document : getDelegate().getAllVersions()) {
+            versions.add(document.getVersionLabel());
+        }
+
+        return versions;
     }
 
     /**
@@ -75,13 +74,14 @@ public class DocumentView extends FileView {
      *
      * @see #getVersionLabel()
      */
-    public DocumentView getObjectOfVersion(final String versionLabel) {
-        return new DocumentView(_(getDelegate().getAllVersions()).find(new Lambda1<Boolean, Document>() {
-            @Override
-            public Boolean call(Document o) {
-                return o.getVersionLabel().equals(versionLabel);
+    public DocumentView getObjectOfVersion(String versionLabel) {
+        for (Document document : getDelegate().getAllVersions()) {
+            if (document.getVersionLabel().equals(versionLabel)) {
+                return new DocumentView(document);
             }
-        }));
+        }
+
+        return null;
     }
 
     /**

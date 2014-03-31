@@ -2,10 +2,8 @@ package com.github.atave.VaadinCmisBrowser.cmis.impl;
 
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
-import com.github.atave.junderscore.Lambda1;
 import org.junit.Test;
 
-import static com.github.atave.junderscore.JUnderscore._;
 import static org.junit.Assert.*;
 
 public class DeletionTest extends CmisClientTestBase {
@@ -19,12 +17,14 @@ public class DeletionTest extends CmisClientTestBase {
         final String documentPath = versionedDocument.getPath();
         client.deleteDocument(documentPath);
 
-        boolean found = _(client.getCurrentFolder().getDocuments()).some(new Lambda1<Boolean, DocumentView>() {
-            @Override
-            public Boolean call(DocumentView o) {
-                return o.getPath().equals(documentPath);
+        boolean found = false;
+
+        for (DocumentView document : client.getCurrentFolder().getDocuments()) {
+            if (document.getPath().equals(documentPath)) {
+                found = true;
+                break;
             }
-        });
+        }
 
         assertFalse(found);
     }
@@ -47,12 +47,14 @@ public class DeletionTest extends CmisClientTestBase {
         assertEquals(versionedDocument.getAllVersions().size(), contents.length - 1);
         assertNotEquals(versionedDocument.getVersionLabel(), latestVersion);
 
-        boolean found = _(client.getCurrentFolder().getDocuments()).some(new Lambda1<Boolean, DocumentView>() {
-            @Override
-            public Boolean call(DocumentView o) {
-                return o.getPath().equals(documentPath);
+        boolean found = false;
+
+        for (DocumentView document : client.getCurrentFolder().getDocuments()) {
+            if (document.getPath().equals(documentPath)) {
+                found = true;
+                break;
             }
-        });
+        }
 
         assertTrue(found);
 
@@ -71,12 +73,14 @@ public class DeletionTest extends CmisClientTestBase {
         final String folderPath = folder.getPath();
         client.deleteFolder(folderPath);
 
-        boolean found = _(client.getCurrentFolder().getFolders()).some(new Lambda1<Boolean, FolderView>() {
-            @Override
-            public Boolean call(FolderView o) {
-                return o.getPath().equals(folderPath);
+        boolean found = false;
+
+        for (FolderView folderView : client.getCurrentFolder().getFolders()) {
+            if (folderView.getPath().equals(folderPath)) {
+                found = true;
+                break;
             }
-        });
+        }
 
         assertFalse(found);
     }

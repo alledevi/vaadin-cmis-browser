@@ -3,7 +3,6 @@ package com.github.atave.VaadinCmisBrowser.cmis.impl;
 import com.github.atave.VaadinCmisBrowser.cmis.api.*;
 import com.github.atave.VaadinCmisBrowser.utils.Config;
 import com.github.atave.VaadinCmisBrowser.utils.RestClient;
-import com.github.atave.junderscore.Lambda1;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -13,10 +12,11 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.impl.json.JSONArray;
 import org.apache.chemistry.opencmis.commons.impl.json.JSONObject;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
-
-import static com.github.atave.junderscore.JUnderscore._;
 
 
 /**
@@ -209,12 +209,9 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
         objectId = normalizeNodeRef(objectId);
 
         JSONArray data = new JSONArray();
-        data.addAll(_(tags).map(new Lambda1<Object, String>() {
-            @Override
-            public Object call(String o) {
-                return o.toLowerCase();
-            }
-        }));
+        for (String tag : tags) {
+            data.add(tag.toLowerCase());
+        }
 
         return restClient.post(
                 String.format(TAGS_FOR_NODE_URL, objectId),
@@ -238,13 +235,13 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
     public void removeTags(String objectId, Collection<String> tags) throws IOException {
         objectId = normalizeNodeRef(objectId);
 
+        Collection<String> lowercaseTags = new ArrayList<>();
+        for (String tag : tags) {
+            lowercaseTags.add(tag.toLowerCase());
+        }
+
         Collection<String> currentTags = getTags(objectId);
-        currentTags.removeAll(_(tags).map(new Lambda1<Object, String>() {
-            @Override
-            public Object call(String o) {
-                return o.toLowerCase();
-            }
-        }));
+        currentTags.removeAll(lowercaseTags);
 
         setTags(objectId, currentTags);
     }
@@ -344,7 +341,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
                         byte[] buffer = new byte[4096];
                         int len;
 
-                        while((len = inputStream.read(buffer)) > -1) {
+                        while ((len = inputStream.read(buffer)) > -1) {
                             byteArrayOutputStream.write(buffer, 0, len);
                         }
                         byteArrayOutputStream.flush();

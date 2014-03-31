@@ -1,15 +1,12 @@
 package com.github.atave.VaadinCmisBrowser.cmis.api;
 
-import com.github.atave.junderscore.Lambda1;
-import com.github.atave.junderscore._map;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collection;
-
-import static com.github.atave.junderscore.JUnderscore._;
 
 
 /**
@@ -36,52 +33,47 @@ public class FolderView extends FileView {
      * Returns the children of this folder.
      */
     public Collection<FileView> getChildren() {
-        return new _map<FileView, CmisObject>() {
-            @Override
-            protected FileView process(CmisObject object) {
-                if (object instanceof Document) {
-                    return new DocumentView((Document) object);
-                } else if (object instanceof Folder) {
-                    return new FolderView((Folder) object);
-                } else {
-                    return null;
-                }
+        Collection<FileView> children = new ArrayList<>();
+
+        for (CmisObject object : getDelegate().getChildren()) {
+            if (object instanceof Document) {
+                children.add(new DocumentView((Document) object));
+            } else if (object instanceof Folder) {
+                children.add(new FolderView((Folder) object));
             }
-        }.on(getDelegate().getChildren());
+        }
+
+        return children;
     }
 
     /**
      * Returns the documents whose first parent is this folder.
      */
     public Collection<DocumentView> getDocuments() {
-        return _(getChildren()).filter(new Lambda1<Boolean, FileView>() {
-            @Override
-            public Boolean call(FileView o) {
-                return o.isDocument();
+        Collection<DocumentView> documents = new ArrayList<>();
+
+        for (FileView file : getChildren()) {
+            if (file.isDocument()) {
+                documents.add(file.asDocument());
             }
-        }).map(new Lambda1<DocumentView, FileView>() {
-            @Override
-            public DocumentView call(FileView o) {
-                return o.asDocument();
-            }
-        }).value();
+        }
+
+        return documents;
     }
 
     /**
      * Returns the direct subfolders.
      */
     public Collection<FolderView> getFolders() {
-        return _(getChildren()).filter(new Lambda1<Boolean, FileView>() {
-            @Override
-            public Boolean call(FileView o) {
-                return o.isFolder();
+        Collection<FolderView> documents = new ArrayList<>();
+
+        for (FileView file : getChildren()) {
+            if (file.isFolder()) {
+                documents.add(file.asFolder());
             }
-        }).map(new Lambda1<FolderView, FileView>() {
-            @Override
-            public FolderView call(FileView o) {
-                return o.asFolder();
-            }
-        }).value();
+        }
+
+        return documents;
     }
 
     /**

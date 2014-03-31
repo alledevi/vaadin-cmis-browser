@@ -1,6 +1,5 @@
 package com.github.atave.VaadinCmisBrowser.cmis.api;
 
-import com.github.atave.junderscore._map;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.util.FileUtils;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -18,10 +17,7 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -161,12 +157,13 @@ public abstract class CmisClient implements DocumentFetcher {
      * Returns the available repositories.
      */
     public Collection<RepositoryView> getRepositories() {
-        return new _map<RepositoryView, Repository>() {
-            @Override
-            protected RepositoryView process(Repository object) {
-                return new RepositoryView(object);
-            }
-        }.on(getSessionFactory().getRepositories(getSessionParametersFactory().newInstance()));
+        Collection<RepositoryView> repositories = new ArrayList<>();
+
+        for (Repository repository : getSessionFactory().getRepositories(getSessionParametersFactory().newInstance())) {
+            repositories.add(new RepositoryView(repository));
+        }
+
+        return repositories;
     }
 
     /**
@@ -382,28 +379,17 @@ public abstract class CmisClient implements DocumentFetcher {
      * Recursively delete a folder.
      *
      * @param folderPath path of the folder to delete
-     * @return the paths of folder and documents that could not be deleted
+     * @return a list of object ids which failed to be deleted
      */
     public Collection<String> deleteFolder(String folderPath) {
-        List<String> failed = getBareFolder(folderPath).deleteTree(true, UnfileObject.DELETE, true);
-        return new _map<String, String>() {
-            @Override
-            protected String process(String objectId) {
-                if (isFolder(objectId)) {
-                    return getBareFolder(objectId).getPath();
-                } else {
-                    // Ignore multiple paths
-                    return getBareDocument(objectId).getPaths().get(0);
-                }
-            }
-        }.on(failed);
+        return getBareFolder(folderPath).deleteTree(true, UnfileObject.DELETE, true);
     }
 
     /**
      * Recursively delete a folder.
      *
      * @param folder the folder to delete
-     * @return the paths of folder and documents that could not be deleted
+     * @return a list of object ids which failed to be deleted
      */
     public Collection<String> deleteFolder(FolderView folder) {
         return deleteFolder(folder.getPath());

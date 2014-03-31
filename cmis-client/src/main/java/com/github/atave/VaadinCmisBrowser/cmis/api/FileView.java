@@ -1,11 +1,11 @@
 package com.github.atave.VaadinCmisBrowser.cmis.api;
 
-import com.github.atave.junderscore._map;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.enums.Action;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -103,12 +103,13 @@ public class FileView {
      * this object is unfiled or if this object is the root folder
      */
     public Collection<FolderView> getParents() {
-        return new _map<FolderView, Folder>() {
-            @Override
-            protected FolderView process(Folder object) {
-                return new FolderView(object);
-            }
-        }.on(delegate.getParents());
+        Collection<FolderView> parents = new ArrayList<>();
+
+        for (Folder folder : delegate.getParents()) {
+            parents.add(new FolderView(folder));
+        }
+
+        return parents;
     }
 
     /**
@@ -140,6 +141,7 @@ public class FileView {
     /**
      * Returns the value of the requested property. If the property is not
      * available, <code>null</code> is returned.
+     *
      * @param propertyId
      */
     public <T> T getProperty(String propertyId) {
