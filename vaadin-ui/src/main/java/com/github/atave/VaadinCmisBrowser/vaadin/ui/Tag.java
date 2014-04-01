@@ -54,7 +54,7 @@ public class Tag extends CustomComponent {
     public Tag(final String path, final String name, final AlfrescoClient client) {
         this.pathParent = path;
         this.client = client;
-        this.pathFile = pathParent + name;
+        this.pathFile = (pathParent.endsWith("/") ? pathParent : pathParent + "/") + name;
 
         // panel for add tag
         background = new Panel();
