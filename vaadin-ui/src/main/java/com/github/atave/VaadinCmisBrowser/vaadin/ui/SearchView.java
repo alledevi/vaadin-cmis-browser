@@ -47,6 +47,7 @@ public class SearchView extends VerticalLayout implements View {
     private FormLayout bottomSearchLayout;
     private Image logoSearch;
     private Label advancedSearch;
+    private Collection<Field> inputFields = new ArrayList<>();
     private TextField keyWords;
     private TextField name;
     private TextField author;
@@ -143,6 +144,7 @@ public class SearchView extends VerticalLayout implements View {
         name.setImmediate(true);
         name.setDescription("Enter the Name of the document to search");
         name.addTextChangeListener(textListener);
+        inputFields.add(name);
 
         // TextField author
         author = new TextField("Author: ");
@@ -151,6 +153,7 @@ public class SearchView extends VerticalLayout implements View {
         author.setImmediate(true);
         author.setDescription("Enter the Author of the document to search");
         author.addTextChangeListener(textListener);
+        inputFields.add(author);
 
         // TextField mod
         mod = new TextField("Modifier: ");
@@ -159,6 +162,7 @@ public class SearchView extends VerticalLayout implements View {
         mod.setImmediate(true);
         mod.setDescription("Enter the Modifier of the document to search");
         mod.addTextChangeListener(textListener);
+        inputFields.add(mod);
 
         // TextArea text
         text = new TextArea("Content: ");
@@ -167,6 +171,7 @@ public class SearchView extends VerticalLayout implements View {
         text.setDescription("Enter a word contained in the document to search");
         advancedLayout.addComponent(text);
         text.addTextChangeListener(textListener);
+        inputFields.add(text);
 
         // DateField creationDate
         creationDate = new DateField("Created Before: ");
@@ -174,6 +179,7 @@ public class SearchView extends VerticalLayout implements View {
         creationDate.setImmediate(true);
         creationDate.setDescription("Enter the creation date of the document to search");
         creationDate.addValueChangeListener(dateListener);
+        inputFields.add(creationDate);
 
         // DateField modDate
         modDate = new DateField("Modified Before: ");
@@ -181,6 +187,7 @@ public class SearchView extends VerticalLayout implements View {
         modDate.setImmediate(true);
         modDate.setDescription("Enter the modified date of the document to search");
         modDate.addValueChangeListener(dateListener);
+        inputFields.add(modDate);
 
         // BOTTOMSEARCHLAYOUT: Button searchButton
         bottomSearchLayout = new FormLayout();
@@ -267,52 +274,7 @@ public class SearchView extends VerticalLayout implements View {
         private static final long serialVersionUID = 1L;
 
         public void textChange(TextChangeEvent event) {
-
-            if (event.getComponent().getCaption().equals("Keywords: ")) {
-                if (event.getText().equals("") && name.getValue().equals("") && author.getValue().equals("")
-                        && mod.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
-                        && modDate.getValue() == null) {
-                    // Disable searchButton
-                    searchButton.setEnabled(false);
-                } else
-                    // Enable searchButton
-                    searchButton.setEnabled(true);
-
-            } else if (event.getComponent().getCaption().equals("Name: ")) {
-                if (event.getText().equals("") && keyWords.getValue().equals("") && author.getValue().equals("")
-                        && mod.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
-                        && modDate.getValue() == null) {
-                    // Disable searchButton
-                    searchButton.setEnabled(false);
-                } else
-                    // Enable searchButton
-                    searchButton.setEnabled(true);
-            } else if (event.getComponent().getCaption().equals("Author: ")) {
-                if (event.getText().equals("") && name.getValue().equals("") && keyWords.getValue().equals("")
-                        && mod.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
-                        && modDate.getValue() == null) {
-                    // Disable searchButton
-                    searchButton.setEnabled(false);
-                } else
-                    // Enable searchButton
-                    searchButton.setEnabled(true);
-            } else if (event.getComponent().getCaption().equals("Modifier: ")) {
-                if (event.getText().equals("") && name.getValue().equals("") && author.getValue().equals("")
-                        && keyWords.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
-                        && modDate.getValue() == null) {
-                    // Disable searchButton
-                    searchButton.setEnabled(false);
-                } else
-                    // Enable searchButton
-                    searchButton.setEnabled(true);
-            } else if (event.getComponent().getCaption().equals("Content: ")) {
-                if (event.getText().equals("") && name.getValue().equals("") && author.getValue().equals("")
-                        && mod.getValue().equals("") && keyWords.getValue().equals("") && creationDate.getValue() == null
-                        && modDate.getValue() == null) {
-                    // Disable searchButton
-                    searchButton.setEnabled(false);
-                }
-            }
+            updateSearchButtonState(event.getComponent(), event.getText());
         }
     };
 
@@ -324,15 +286,7 @@ public class SearchView extends VerticalLayout implements View {
         private static final long serialVersionUID = 1L;
 
         public void valueChange(ValueChangeEvent event) {
-
-            if (creationDate.getValue() == null && modDate.getValue() == null && name.getValue().equals("")
-                    && author.getValue().equals("") && mod.getValue().equals("") && keyWords.getValue().equals("")
-                    && text.getValue().equals(""))
-                // Disable searchButton
-                searchButton.setEnabled(false);
-            else
-                // Enable searchButton
-                searchButton.setEnabled(true);
+            updateSearchButtonState(null, event.getProperty().getValue());
         }
     };
 
@@ -345,9 +299,7 @@ public class SearchView extends VerticalLayout implements View {
 
         public void buttonClick(ClickEvent event) {
 
-            // searchButton
             if (event.getButton().equals(searchButton)) {
-
                 Collection<PropertyMatcher> matchers = new ArrayList<>();
                 ItemIterable<DocumentView> results;
                 String nameDocument = name.getValue();
@@ -431,4 +383,26 @@ public class SearchView extends VerticalLayout implements View {
 
     }
 
+    private boolean isValid(Object value) {
+        if (value instanceof String) {
+            return !((String) value).isEmpty();
+        } else {
+            return value != null;
+        }
+    }
+
+    private void updateSearchButtonState(Component component, Object value) {
+        if (!isValid(value)) {
+            for (Field field : inputFields) {
+                if (field != component && isValid(field.getValue())) {
+                    searchButton.setEnabled(true);
+                    return;
+                }
+            }
+
+            searchButton.setEnabled(false);
+        } else {
+            searchButton.setEnabled(true);
+        }
+    }
 }
