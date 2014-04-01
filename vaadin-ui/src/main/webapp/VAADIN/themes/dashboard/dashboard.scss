@@ -729,27 +729,47 @@
     .v-button-caption {}
    }
    
-     .search-view .v-formlayout {
+       .search-view .v-formlayout.f {
           
-         padding: 10px 20px;
+         padding: 10px 10px;
          border: .1em solid #b3b4b5;
 		border-top-color: #d4d4d6;
 		border-bottom-color: #989b9c;
 		
      	.v-formlayout-captioncell {
-            vertical-align: middle;
-      		horizontal-align: middle;
+     	margin-left: 100px;
+     	   vertical-align: middle;
+      		horizontal-align: right;
+           
+        }
+    }
+   
+     .search-view .v-formlayout.f1 {
+          
+         padding: 10px 10px;
+         border: .1em solid #b3b4b5;
+		border-top-color: #d4d4d6;
+		border-bottom-color: #989b9c;
+		
+     	.v-formlayout-captioncell {
+     	padding: 10px 20px;
+     	   vertical-align: middle;
+      		horizontal-align: right;
+           
         }
     }
     
-    .search-view .v-horizontallayout {
-		padding: 0 0 0;
-	}
-	
-	  .search-view .v-verticallayout {
-		padding: 0 20px 20px;
-	}
+         .search-view .v-formlayout.f2{
+          
+         //padding: 10px 10px;	
+				
+     	.v-formlayout-captioncell {
+            vertical-align: top;
+      		horizontal-align: right;
+        }
+    }
 
+	/*
 	.search-view .v-spacing {
 		width: 20px;
 		height: 20px;
@@ -758,14 +778,6 @@
 	
 	.search-view .toolbar .v-spacing {
 		width: 10px;
-	}
-	
-	
-	/*
-	.search-view .v-csslayout {
-		padding: 50px 20px 0;
-		overflow: auto;
-		position: relative;
 	}
 	*/
 
@@ -794,8 +806,8 @@
 	}
 	
 	.search-view .v-textarea {
-		padding: 20px 20px 0;
-		line-height: 10px;
+		//padding: 20px 20px 0;
+		//line-height: 10px;
 		//background: #fffdf2 url(img/notes-bg.png) repeat;
 		//color: #545145;
 		@include border-radius(4px);
@@ -809,7 +821,7 @@
 	
 	
 	.search-view .notes .v-textarea:focus {
-		outline: none;
+		//outline: none;
 	}
 	
 	
@@ -853,6 +865,23 @@
 		background: -ms-linear-gradient(top, #d8d9da 0%,#e6e7e8 10%,#e0e1e2 100%);
 	/* 	background: linear-gradient(to bottom, #d8d9da 0%,#e6e7e8 10%,#e0e1e2 100%); */
 	}
+	
+	    /*nodo selezionato nel tree*/
+    .v-tree-node-selected span {
+        background: #4d749f repeat-x;        
+        text-shadow: 0 2px 2px rgba(0,0,0,.5);        
+        font-weight:bold; /* grassetto */
+        color: #fff;
+        padding: 1px 2px;  
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;       
+        display: inline-block;
+    }
+    
+     /*modifca la freccina del tree*/
+    .v-tree-node {
+      /* background: transparent url(img/folder-icon.png) no-repeat 6px -10px; */
+    }
 	
 	
   

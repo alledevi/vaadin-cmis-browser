@@ -1,287 +1,434 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.commons.PropertyIds;
-
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyMatcher;
 import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyType;
 import com.github.atave.VaadinCmisBrowser.cmis.api.QueryOperator;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
+import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * Search view. The second tab of application
+ */
+
+public class SearchView extends VerticalLayout implements View {
+
+    private static final long serialVersionUID = 1L;
+    private static final String layoutWidth = "100%";
+    private static final String Text1Width = "50%";
+    private static final String formWidth = "70%";
+    private static final String Text2Width = "90%";
+    private static final String logoSize = "45px";
+    private static final String searchImage = "img/search36.png";
+    private static final String logoImage = "img/alfresco.png";
+    private static final String backImage = "img/back.png";
+
+    // AlfrescoClient
+    private AlfrescoClient client;
+
+    // SearchLayout
+    private HorizontalLayout topSearchLayout;
+    private VerticalLayout middleSearchLayout;
+    private FormLayout bottomSearchLayout;
+    private Image logoSearch;
+    private Label advancedSearch;
+    private TextField keyWords;
+    private TextField name;
+    private TextField author;
+    private TextArea text;
+    private DateField creationDate;
+    private DateField modDate;
+    private TextField mod;
+    private Button searchButton;
+
+    // ResultLayout
+    private HorizontalLayout topResultLayout;
+    private HorizontalLayout middleResultLayout;
+    private VerticalLayout bottomResultLayout;
+    private FormLayout tagLayout;
+    private FormLayout advancedLayout;
+    private Image logoResult;
+    private Label resultSearch;
+    private Label numberResults;
+    private TableComponent table;
+    private Button returnButton;
 
 
-public class SearchView extends VerticalLayout implements View  {
+    public SearchView() {
 
-	private static final long serialVersionUID = 1L;
+        setSizeFull();
+        setMargin(true);
+        addStyleName("search-view");
 
-	private AlfrescoClient client;
-	private TableComponent table;
+        client = ((AppUI) UI.getCurrent()).getClient();
 
-	private HorizontalLayout topSearchLayout;
-	private VerticalLayout middleSearchLayout;
-	private VerticalLayout middleResultLayout;
-	private HorizontalLayout dateLayout;
-	private HorizontalLayout topResultLayout;
+        // TOPSEARCHLAYOUT: image logoSearch + label advancedSearch
+        topSearchLayout = new HorizontalLayout();
+        topSearchLayout.addStyleName("toolbar");
+        topSearchLayout.setWidth(layoutWidth);
+        topSearchLayout.setSpacing(true);
+        addComponent(topSearchLayout);
 
-	private Label advancedSearch;
-	private Label resultSearch;
-	private TextField keyWords;
-	private TextField name;
-	private TextArea text;
-	private TextField author;
-	private ComboBox mimeType;
-	private DateField fromDate;
-	private DateField toDate;
-	private TextField mod;
-	private Button searchButton;
-	private Button returnButton;
+        // Image logoSearch
+        logoSearch = new Image(null, new ThemeResource(logoImage));
+        logoSearch.setHeight(logoSize);
+        logoSearch.setWidth(logoSize);
+        topSearchLayout.addComponent(logoSearch);
+        topSearchLayout.setComponentAlignment(logoSearch, Alignment.MIDDLE_LEFT);
 
-	public SearchView() {
+        // Label advancedSearch
+        advancedSearch = new Label("Advanced Search");
+        advancedSearch.addStyleName("h1");
+        advancedSearch.setSizeUndefined();
+        topSearchLayout.addComponent(advancedSearch);
+        topSearchLayout.setComponentAlignment(advancedSearch, Alignment.MIDDLE_LEFT);
+        topSearchLayout.setExpandRatio(advancedSearch, 1);
 
-		setSizeFull();
-		addStyleName("search-view");
-		client = ((AppUI)UI.getCurrent()).getClient();
+        // MIDDLESEARCHLAYOUT: FormLayout tagLayout + FormLayout advancedLayout + FormLayout bottomSearchLayout
+        middleSearchLayout = new VerticalLayout();
+        middleSearchLayout.setSpacing(true);
+        middleSearchLayout.setWidth(formWidth);
+        middleSearchLayout.setMargin(true);
+        middleSearchLayout.addShortcutListener(enter);
+        addComponent(middleSearchLayout);
+        setExpandRatio(middleSearchLayout, 4);
 
-		topSearchLayout = new HorizontalLayout();
-		topSearchLayout.setWidth("100%");
-		topSearchLayout.setSpacing(true);
-		topSearchLayout.addStyleName("toolbar");
-		addComponent(topSearchLayout);
+        Label l = new Label("You can perform searches by entering one or more pieces of information about a document.");
+        l.setSizeUndefined();
+        middleSearchLayout.addComponent(l);
 
-		Image logo = new Image(null, new ThemeResource("img/alfresco.png"));
-		logo.setHeight("45px");
-		logo.setWidth("45px");
-		topSearchLayout.addComponent(logo);
+        // FormLayout tagLayout: TextField keyWords
+        tagLayout = new FormLayout();
+        tagLayout.addStyleName("f");
+        tagLayout.setSpacing(true);
+        middleSearchLayout.addComponent(tagLayout);
 
-		// advancedSearch : title
-		advancedSearch = new Label("Ricerca Avanzata");
-		advancedSearch.addStyleName("h1");
-		advancedSearch.setSizeUndefined();
-		topSearchLayout.addComponent(advancedSearch);
-		topSearchLayout.setComponentAlignment(advancedSearch, Alignment.MIDDLE_LEFT);
-		topSearchLayout.setExpandRatio(advancedSearch, 1);
+        // TextField KeyWords
+        keyWords = new TextField("Keywords: ");
+        tagLayout.addComponent(keyWords);
+        keyWords.setWidth(Text2Width);
+        keyWords.setImmediate(true);
+        keyWords.setDescription("Enter one or more tag of the document to search");
+        keyWords.addTextChangeListener(textListener);
 
-		middleSearchLayout = new VerticalLayout();
-		middleSearchLayout.setSpacing(true);
-		middleSearchLayout.setMargin(true);
-		middleSearchLayout.setWidth("70%");
-		middleSearchLayout.setHeight("100%");
-		addComponent(middleSearchLayout);
-		setExpandRatio(middleSearchLayout, 4);
+		/* FormLayout advancedLayout: TextField name, author, mod
+                                        TextArea text
+							  		  DateField creationDate, modDate
+		 */
+        advancedLayout = new FormLayout();
+        advancedLayout.addStyleName("f1");
+        advancedLayout.setSpacing(true);
+        middleSearchLayout.addComponent(advancedLayout);
+        middleSearchLayout.setExpandRatio(advancedLayout, 4);
 
-		// Tag
-		
-		FormLayout tagLayout = new FormLayout();
-		tagLayout.setSpacing(true);
-		middleSearchLayout.addComponent(tagLayout);
-		keyWords = new TextField("Parole chiave");
-		tagLayout.addComponent(keyWords);
-		keyWords.setWidth("90%");;
-//		middleSearchLayout.setExpandRatio(tagLayout, 1);
+        // TextField name
+        name = new TextField("Name: ");
+        advancedLayout.addComponent(name);
+        name.setWidth(Text1Width);
+        name.setImmediate(true);
+        name.setDescription("Enter the Name of the document to search");
+        name.addTextChangeListener(textListener);
 
-		FormLayout advancedLayout = new FormLayout();
-		advancedLayout.setSpacing(true);
-		advancedLayout.setSizeFull();
-		middleSearchLayout.addComponent(advancedLayout);
-		middleSearchLayout.setExpandRatio(advancedLayout, 3);
+        // TextField author
+        author = new TextField("Author: ");
+        advancedLayout.addComponent(author);
+        author.setWidth(Text1Width);
+        author.setImmediate(true);
+        author.setDescription("Enter the Author of the document to search");
+        author.addTextChangeListener(textListener);
 
-		name = new TextField("Nome");
-		advancedLayout.addComponent(name);
-		name.setWidth("50%");
+        // TextField mod
+        mod = new TextField("Modifier: ");
+        advancedLayout.addComponent(mod);
+        mod.setWidth(Text1Width);
+        mod.setImmediate(true);
+        mod.setDescription("Enter the Modifier of the document to search");
+        mod.addTextChangeListener(textListener);
 
-		author = new TextField("Autore");
-		advancedLayout.addComponent(author);
-		author.setWidth("50%");
+        // TextArea text
+        text = new TextArea("Content: ");
+        text.setWidth(Text2Width);
+        text.setImmediate(true);
+        text.setDescription("Enter a word contained in the document to search");
+        advancedLayout.addComponent(text);
+        text.addTextChangeListener(textListener);
 
-		text = new TextArea("Contenuto");
-		text.setWidth("90%");
-		advancedLayout.addComponent(text);
+        // DateField creationDate
+        creationDate = new DateField("Created Before: ");
+        advancedLayout.addComponent(creationDate);
+        creationDate.setImmediate(true);
+        creationDate.setDescription("Enter the creation date of the document to search");
+        creationDate.addValueChangeListener(dateListener);
 
-		mimeType = new ComboBox("Mimetype");
-		advancedLayout.addComponent(mimeType);
-		mimeType.setWidth("50%");
+        // DateField modDate
+        modDate = new DateField("Modified Before: ");
+        advancedLayout.addComponent(modDate);
+        modDate.setImmediate(true);
+        modDate.setDescription("Enter the modified date of the document to search");
+        modDate.addValueChangeListener(dateListener);
 
-		dateLayout = new HorizontalLayout();
-		dateLayout.setSpacing(true);
-		dateLayout.setCaption("Data di modifica");
-		advancedLayout.addComponent(dateLayout);
+        // BOTTOMSEARCHLAYOUT: Button searchButton
+        bottomSearchLayout = new FormLayout();
+        bottomSearchLayout.addStyleName("f2");
+        bottomSearchLayout.setSpacing(true);
+        bottomSearchLayout.setWidth(layoutWidth);
+        middleSearchLayout.addComponent(bottomSearchLayout);
 
-		fromDate = new DateField("Da");
-		dateLayout.addComponent(fromDate);
+        // Button searchButton
+        searchButton = new Button("Search");
+        searchButton.addStyleName("default1");
+        searchButton.setIcon(new ThemeResource(searchImage));
+        searchButton.setEnabled(false);
+        bottomSearchLayout.addComponent(searchButton);
+        bottomSearchLayout.setComponentAlignment(searchButton, Alignment.TOP_RIGHT);
+        searchButton.addClickListener(searchListener);
 
-		toDate = new DateField("A");
-		dateLayout.addComponent(toDate);
+        // TOPRESULTLAYOUT: Image logoResult + Label resultSearch
+        topResultLayout = new HorizontalLayout();
+        topResultLayout.addStyleName("toolbar");
+        topResultLayout.setWidth(layoutWidth);
+        topResultLayout.setSpacing(true);
+        topResultLayout.setVisible(false);
+        addComponent(topResultLayout);
 
-		mod = new TextField("Modificatore");
-		advancedLayout.addComponent(mod);
-		mod.setWidth("50%");
+        // Image logoResult
+        logoResult = new Image(null, new ThemeResource(logoImage));
+        logoResult.setHeight(logoSize);
+        logoResult.setWidth(logoSize);
+        topResultLayout.addComponent(logoResult);
+        topResultLayout.setComponentAlignment(logoResult, Alignment.MIDDLE_LEFT);
 
-		searchButton = new Button("Search");
-		searchButton.addStyleName("default");
-		searchButton.setIcon(new ThemeResource("img/search36.png"));
-		middleSearchLayout.addComponent(searchButton);
-		middleSearchLayout.setComponentAlignment(searchButton, Alignment.MIDDLE_RIGHT);
-//		middleSearchLayout.setExpandRatio(searchButton, 1);
+        // Label resultSearch
+        resultSearch = new Label("Advanced Search Results");
+        resultSearch.addStyleName("h1");
+        resultSearch.setSizeUndefined();
+        topResultLayout.addComponent(resultSearch);
+        topResultLayout.setComponentAlignment(resultSearch, Alignment.MIDDLE_LEFT);
+        topResultLayout.setExpandRatio(resultSearch, 1);
 
-		searchButton.addClickListener(searchListener);
+        // MIDDLERESULTLAYOUT: Label numberResults + Button returnButton
+        middleResultLayout = new HorizontalLayout();
+        middleResultLayout.setSpacing(true);
+        middleResultLayout.setMargin(true);
+        middleResultLayout.setWidth(layoutWidth);
+        middleResultLayout.setVisible(false);
+        addComponent(middleResultLayout);
+        setExpandRatio(middleResultLayout, 1);
 
-		// resultLayout risultati ricerca: resultSearch + table + returnButton 
-		topResultLayout = new HorizontalLayout();
-		topResultLayout.setVisible(false);
-		topResultLayout.setWidth("100%");
-		topResultLayout.setSpacing(true);
-		topResultLayout.addStyleName("toolbar");
-		addComponent(topResultLayout);
-		
+        // Label numberResults
+        numberResults = new Label();
+        numberResults.addStyleName("h2");
+        middleResultLayout.addComponent(numberResults);
+        middleResultLayout.setComponentAlignment(numberResults, Alignment.MIDDLE_LEFT);
 
-		Image logoResult = new Image(null, new ThemeResource("img/alfresco.png"));
-		logoResult.setHeight("45px");
-		logoResult.setWidth("45px");
-		topResultLayout.addComponent(logoResult);
+        // Button returnButton
+        returnButton = new Button("Return to advanced search");
+        returnButton.addStyleName("link");
+        returnButton.setIcon(new ThemeResource(backImage));
+        middleResultLayout.addComponent(returnButton);
+        middleResultLayout.setComponentAlignment(returnButton, Alignment.MIDDLE_RIGHT);
+        returnButton.addClickListener(searchListener);
 
-		resultSearch = new Label("Risultati Ricerca Avanzata");
-		resultSearch.addStyleName("h1");
-		resultSearch.setSizeUndefined();
-		topResultLayout.addComponent(resultSearch);
-		topResultLayout.setComponentAlignment(resultSearch, Alignment.MIDDLE_LEFT);
-		topResultLayout.setExpandRatio(resultSearch, 1);
-		
-		middleResultLayout = new VerticalLayout();
-		middleResultLayout.setSpacing(true);
-		middleResultLayout.setMargin(true);
-		middleResultLayout.setSizeFull();
-		middleResultLayout.setVisible(false);
-		addComponent(middleResultLayout);
-		setExpandRatio(middleResultLayout, 2);
+        // BOTTOMRESULTLAYOUT: TableComponent Table
+        bottomResultLayout = new VerticalLayout();
+        bottomResultLayout.setSpacing(true);
+        bottomResultLayout.setMargin(true);
+        bottomResultLayout.setVisible(false);
+        addComponent(bottomResultLayout);
+        setExpandRatio(bottomResultLayout, 5);
 
-		returnButton  = new Button("Ritorna alla ricerca");
-		returnButton.setIcon(new ThemeResource("img/back.png"));
-		returnButton.addStyleName("link");
-		middleResultLayout.addComponent(returnButton);
-		middleResultLayout.setComponentAlignment(returnButton, Alignment.TOP_RIGHT);
-		middleResultLayout.setExpandRatio(returnButton, 1);
-		returnButton.addClickListener(searchListener);
-		
-		// table
-		table = new TableComponent(null,client,null);
-		table.pageLength(12);
-		table.setWidth("90%");
-		middleResultLayout.addComponent(table);
-		middleResultLayout.setComponentAlignment(table, Alignment.TOP_CENTER);
+        // TableComponent Table
+        table = new TableComponent(client, null);
+        table.pageLength(9);
+        bottomResultLayout.addComponent(table);
+        bottomResultLayout.setComponentAlignment(table, Alignment.TOP_CENTER);
+    }
 
-		
+    /**
+     * Listener for texfield and textarea. Enable/Disable searchButton
+     */
+    TextChangeListener textListener = new TextChangeListener() {
 
-	}
+        private static final long serialVersionUID = 1L;
 
-	Button.ClickListener searchListener = new Button.ClickListener() {
+        public void textChange(TextChangeEvent event) {
 
-		private static final long serialVersionUID = 1L;
+            if (event.getComponent().getCaption().equals("Keywords: ")) {
+                if (event.getText().equals("") && name.getValue().equals("") && author.getValue().equals("")
+                        && mod.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
+                        && modDate.getValue() == null) {
+                    // Disable searchButton
+                    searchButton.setEnabled(false);
+                } else
+                    // Enable searchButton
+                    searchButton.setEnabled(true);
 
-		@SuppressWarnings("deprecation")
-		@Override
-		public void buttonClick(ClickEvent event) {
+            } else if (event.getComponent().getCaption().equals("Name: ")) {
+                if (event.getText().equals("") && keyWords.getValue().equals("") && author.getValue().equals("")
+                        && mod.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
+                        && modDate.getValue() == null) {
+                    // Disable searchButton
+                    searchButton.setEnabled(false);
+                } else
+                    // Enable searchButton
+                    searchButton.setEnabled(true);
+            } else if (event.getComponent().getCaption().equals("Author: ")) {
+                if (event.getText().equals("") && name.getValue().equals("") && keyWords.getValue().equals("")
+                        && mod.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
+                        && modDate.getValue() == null) {
+                    // Disable searchButton
+                    searchButton.setEnabled(false);
+                } else
+                    // Enable searchButton
+                    searchButton.setEnabled(true);
+            } else if (event.getComponent().getCaption().equals("Modifier: ")) {
+                if (event.getText().equals("") && name.getValue().equals("") && author.getValue().equals("")
+                        && keyWords.getValue().equals("") && text.getValue().equals("") && creationDate.getValue() == null
+                        && modDate.getValue() == null) {
+                    // Disable searchButton
+                    searchButton.setEnabled(false);
+                } else
+                    // Enable searchButton
+                    searchButton.setEnabled(true);
+            } else if (event.getComponent().getCaption().equals("Content: ")) {
+                if (event.getText().equals("") && name.getValue().equals("") && author.getValue().equals("")
+                        && mod.getValue().equals("") && keyWords.getValue().equals("") && creationDate.getValue() == null
+                        && modDate.getValue() == null) {
+                    // Disable searchButton
+                    searchButton.setEnabled(false);
+                }
+            }
+        }
+    };
 
-			// searchButton
-			if(event.getButton().equals(searchButton)){
-			
-				Collection<PropertyMatcher> matchers = new ArrayList<>();
+    /**
+     * Listener for datefield. Enable/Disable searchButton
+     */
+    ValueChangeListener dateListener = new ValueChangeListener() {
+
+        private static final long serialVersionUID = 1L;
+
+        public void valueChange(ValueChangeEvent event) {
+
+            if (creationDate.getValue() == null && modDate.getValue() == null && name.getValue().equals("")
+                    && author.getValue().equals("") && mod.getValue().equals("") && keyWords.getValue().equals("")
+                    && text.getValue().equals(""))
+                // Disable searchButton
+                searchButton.setEnabled(false);
+            else
+                // Enable searchButton
+                searchButton.setEnabled(true);
+        }
+    };
+
+    /**
+     * Listener for searchButton and returnButton.
+     */
+    Button.ClickListener searchListener = new Button.ClickListener() {
+
+        private static final long serialVersionUID = 1L;
+
+        public void buttonClick(ClickEvent event) {
+
+            // searchButton
+            if (event.getButton().equals(searchButton)) {
+
+                Collection<PropertyMatcher> matchers = new ArrayList<>();
                 ItemIterable<DocumentView> results;
-				String nameDocument = name.getValue();
-				String textDocument = text.getValue();
+                String nameDocument = name.getValue();
+                String textDocument = text.getValue();
 
-				if(name.getValue().equals(""))
-					nameDocument = null;
+                if (name.getValue().equals(""))
+                    nameDocument = null;
 
-				if(text.getValue().equals(""))
-					textDocument = null;	
+                if (text.getValue().equals(""))
+                    textDocument = null;
 
-				if(!author.getValue().equals(""))
-					matchers.add(new PropertyMatcher(PropertyIds.CREATED_BY, QueryOperator.EQUALS, PropertyType.STRING, author.getValue()));
+                if (!author.getValue().equals(""))
+                    matchers.add(new PropertyMatcher(PropertyIds.CREATED_BY, QueryOperator.EQUALS, PropertyType.STRING, author.getValue()));
 
+                if (!mod.getValue().equals(""))
+                    matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFIED_BY, QueryOperator.EQUALS, PropertyType.STRING, mod.getValue()));
 
-				if(!mod.getValue().equals(""))
-					matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFIED_BY, QueryOperator.EQUALS, PropertyType.STRING, mod.getValue()));
+                if (creationDate.getValue() != null)
+                    matchers.add(new PropertyMatcher(PropertyIds.CREATION_DATE, QueryOperator.LESS_THAN_OR_EQUALS, PropertyType.DATETIME, creationDate.getValue()));
 
-				if(fromDate.getValue() != null)
-					matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.GREATER_THAN_OR_EQUALS, PropertyType.DATETIME, fromDate.getValue()));
+                if (modDate.getValue() != null)
+                    matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.LESS_THAN_OR_EQUALS, PropertyType.DATETIME, modDate.getValue()));
 
-				if(toDate.getValue() != null)
-					matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.LESS_THAN_OR_EQUALS, PropertyType.DATETIME, toDate.getValue()));
-
-                if(!keyWords.getValue().equals("")) {
+                if (!keyWords.getValue().equals("")) {
                     matchers.add(new AlfrescoClient.TagMatcher(keyWords.getValue().split("\\s+")));
                 }
 
-				if(keyWords.getValue().equals("") && nameDocument == null && 
-						textDocument == null && matchers.isEmpty()){
-					// Notification with default settings for a warning
-					Notification notif = new Notification("Error!","Inserire almeno un valore",Notification.TYPE_WARNING_MESSAGE);
+                table.clearTable();
+                topSearchLayout.setVisible(false);
+                middleSearchLayout.setVisible(false);
+                bottomSearchLayout.setVisible(false);
+                topResultLayout.setVisible(true);
+                middleResultLayout.setVisible(true);
+                bottomResultLayout.setVisible(true);
 
-					// Customize it
-					notif.setDelayMsec(2000);
-					notif.setPosition(Position.MIDDLE_CENTER);
-//					notif.setStyleName("error");
-					
-					// Show it in the page
-					notif.show(Page.getCurrent());
-					
-				} else {
+                // start the search
+                results = client.search(nameDocument, textDocument, matchers);
 
-					table.clearTable();
-					topSearchLayout.setVisible(false);
-					middleSearchLayout.setVisible(false);
-					topResultLayout.setVisible(true);
-					middleResultLayout.setVisible(true);
-                    results = client.search(nameDocument, textDocument, matchers);
+                // Add all document to table
+                int num = 0;
+                for (DocumentView document : results) {
+                    table.addItemToTableComponent(document);
+                    // num: number of results
+                    num++;
+                }
 
+                if (num == 1)
+                    numberResults.setValue(num + " search result");
+                else
+                    numberResults.setValue(num + " search results");
 
-					for(DocumentView document : results) {
-                        table.addItemToFolderComponent(document);
-					}
-
-					matchers.removeAll(matchers);
-
-				}
-
+            } else if (event.getButton().equals(returnButton)) {
+                topResultLayout.setVisible(false);
+                middleResultLayout.setVisible(false);
+                bottomResultLayout.setVisible(false);
+                topSearchLayout.setVisible(true);
+                middleSearchLayout.setVisible(true);
+                bottomSearchLayout.setVisible(true);
             }
+        }
+    };
 
+    /**
+     * ShortcutListener enter for middleSearchLayout
+     */
+    final ShortcutListener enter = new ShortcutListener("Search", KeyCode.ENTER, null) {
 
+        private static final long serialVersionUID = 1L;
 
-			// returnButton
-			else if(event.getButton().equals(returnButton)){
-				topResultLayout.setVisible(false);
-				middleResultLayout.setVisible(false);
-				topSearchLayout.setVisible(true);
-				middleSearchLayout.setVisible(true);
-			}
-		}
-	};
+        public void handleAction(Object sender, Object target) {
 
-	@Override
-	public void enter(ViewChangeEvent event) {
+            // searchButton must be Enable
+            if (searchButton.isEnabled()) {
+                searchButton.click();
+            }
+        }
+    };
 
-	}
+    @Override
+    public void enter(ViewChangeEvent event) {
+
+    }
 
 }

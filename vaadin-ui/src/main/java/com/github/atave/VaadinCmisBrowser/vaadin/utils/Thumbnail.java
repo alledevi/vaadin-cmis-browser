@@ -13,8 +13,8 @@ import java.util.Date;
 
 public class Thumbnail extends Image implements StreamResource.StreamSource {
 
-	private static final long serialVersionUID = 1L;
-	private Thumbnailer thumbnailer;
+    private static final long serialVersionUID = 1L;
+    private Thumbnailer thumbnailer;
     private String objectId;
     private StreamResource resource;
 

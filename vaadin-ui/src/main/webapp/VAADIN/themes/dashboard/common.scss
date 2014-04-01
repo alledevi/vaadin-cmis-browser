@@ -28,6 +28,12 @@ $font-size: 14px;
 		line-height: 1.5;
 	}
 	
+	.v-datefield-button {
+   		background: url(img/calendar.png);
+    	height: 24px;
+    	width: 24px;    
+    }
+	
 	.v-spacing {
 	    height: 12px;
 	    width: 12px;
@@ -70,15 +76,20 @@ $font-size: 14px;
 		-ms-interpolation-mode: bicubic;
 	}
 	
+	.v-horizontallayout-top-navigation-breadcrumb-container{
+	
+		width: 200px;
+		height: 200px;
+	}
 	
 	
 	/* Transient overlay elements */
 	.v-contextmenu,
 	.v-menubar-popup,
 	.v-filterselect-suggestpopup,
-	.v-datefield-popup,
+	//.v-datefield-popup,
 	.v-popupview-popup,
-	.v-tooltip,
+	//.v-tooltip,
 	.v-window.dialog,
 	.v-Notification-tray {
 		background: #343638;
@@ -98,7 +109,26 @@ $font-size: 14px;
 		@include fade-in;
 	}
 	
-	.v-tooltip,
+	.v-tooltip{
+		background: #343638;
+		background: rgba(52,54,56,.92);
+		@include box-shadow(0 2px 5px rgba(0,0,0,.5));
+		
+		color: #ffff66;
+		text-shadow: 0 1px 1px rgba(0,0,0,.5);
+		
+		padding: 4px;
+		
+		@include border-radius(.3em);
+		border: none;
+		
+		min-width: 10em;
+		
+		@include fade-in;
+		
+	}
+	
+	/*.v-tooltip,
 	.v-window.dialog {
 		min-width: 0;
 	}
@@ -106,7 +136,7 @@ $font-size: 14px;
 	.v-tooltip {
 		font-size: 12px;
 		padding: 0 4px;
-	}
+	}*/
 	
 	.v-contextmenu table,
 	.v-filterselect-suggestpopup table,

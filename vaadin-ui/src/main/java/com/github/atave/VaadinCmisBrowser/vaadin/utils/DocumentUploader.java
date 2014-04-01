@@ -20,9 +20,9 @@ import java.util.Map;
  */
 public abstract class DocumentUploader implements Upload.Receiver, Upload.SucceededListener {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     private final CmisClient client;
     private final String parent;
