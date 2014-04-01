@@ -333,7 +333,7 @@ public class HomeView extends VerticalLayout implements View {
                 upload.addSucceededListener(receiver);
                 uploadHorizontal.addComponent(upload);
 
-                v = new OptionGroup("Select Version");
+                v = new OptionGroup("New Version");
                 v.addItem(minor);
                 v.addItem(major);
                 upload.submitUpload();
@@ -345,7 +345,9 @@ public class HomeView extends VerticalLayout implements View {
                 info = new Image(null, new ThemeResource(infoIcon));
                 info.setWidth(iconSize);
                 info.setHeight(iconSize);
-                info.setDescription("in minor, in major");
+                info.setDescription("Given a Version expressed as MAJOR.MINOR:</br>" +
+                        "- Minor increases MINOR (es. 1.0 -> 1.1)</br>" +
+                        "- Major increases MAJOR and sets MINOR to 0 (es. 1.1 -> 2.0)");
                 uploadHorizontal.addComponent(info);
 
                 state = new Label();
