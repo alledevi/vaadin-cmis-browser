@@ -34,6 +34,36 @@ public class AppUI extends UI {
 
     // AlfrescoClient
     private AlfrescoClient client;
+    
+    Button buttonHome;
+    Button buttonSearch;
+    private Tree tree = new Tree();
+
+    //getter and setter tree
+    public Tree getTree() {
+        return tree;
+    }
+
+    public void setTree(Tree tree) {
+        this.tree = tree;
+    }
+    
+    public Button getButtonHome() {
+        return buttonHome;
+    }
+
+    public void setButtonHome(Button button) {
+        this.buttonHome = button;
+    }
+    
+    public Button getButtonSearch() {
+        return buttonSearch;
+    }
+
+    public void setButtonSearch(Button button) {
+        this.buttonSearch = button;
+    }
+    
 
     public AlfrescoClient getClient() {
         return client;
@@ -206,27 +236,40 @@ public class AppUI extends UI {
         menu.addStyleName("menu");
         menu.setHeight("100%");
         menu.removeAllComponents();
-        for (final String view : new String[]{"home", "search"}) {
-            Button b = new NativeButton(view.substring(0, 1).toUpperCase()
-                    + view.substring(1).replace('-', ' '));
-            b.addStyleName("icon-" + view);
-            b.addClickListener(new ClickListener() {
-                @Override
-                public void buttonClick(ClickEvent event) {
-                    clearMenuSelection();
-                    event.getButton().addStyleName("selected");
-                    if (!nav.getState().equals("/" + view))
-                        nav.navigateTo("/" + view);
-                }
-            });
-            if (view.equals("home")) {
-                // Add drop target to reports button
-                menu.addComponent(b);
-            } else {
-                menu.addComponent(b);
-            }
-            viewNameToMenuButton.put("/" + view, b);
-        }
+        final String viewHome = "home";
+        buttonHome = new NativeButton(viewHome.substring(0, 1).toUpperCase() 
+        		+ viewHome.substring(1).replace('-', ' '));
+        buttonHome.addStyleName("icon-" + viewHome);
+        buttonHome.addClickListener(new ClickListener() {
+        	@Override
+        	public void buttonClick(ClickEvent event) {
+        		clearMenuSelection();
+        		event.getButton().addStyleName("selected");
+        		if (!nav.getState().equals("/" + viewHome))
+        			nav.navigateTo("/" + viewHome);
+        	}
+        });
+        menu.addComponent(buttonHome);
+        viewNameToMenuButton.put("/" + viewHome, buttonHome);
+        
+        final String viewSearch = "search";
+        buttonSearch = new NativeButton(viewSearch.substring(0, 1).toUpperCase() 
+        		+ viewSearch.substring(1).replace('-', ' '));
+        buttonSearch.addStyleName("icon-" + viewSearch);
+        buttonSearch.addClickListener(new ClickListener() {
+        	@Override
+        	public void buttonClick(ClickEvent event) {
+        		clearMenuSelection();
+        		event.getButton().addStyleName("selected");
+        		if (!nav.getState().equals("/" + viewSearch))
+        			nav.navigateTo("/" + viewSearch);
+        	}
+        });
+        menu.addComponent(buttonSearch);
+        viewNameToMenuButton.put("/" + viewSearch, buttonSearch);
+        
+        
+        
 
         String f = Page.getCurrent().getUriFragment();
         if (f != null && f.startsWith("!")) {

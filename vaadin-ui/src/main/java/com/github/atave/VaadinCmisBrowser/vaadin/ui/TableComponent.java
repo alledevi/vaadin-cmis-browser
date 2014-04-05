@@ -81,7 +81,6 @@ public class TableComponent extends CustomComponent {
         table.setColumnExpandRatio("name", 4);
         table.setColumnExpandRatio("created on", 3);
         table.setColumnExpandRatio("modified on", 3);
-        table.setColumnExpandRatio("created by", 2);
         table.setColumnExpandRatio("action", 2);
 
         //build table from current folder
@@ -322,6 +321,7 @@ public class TableComponent extends CustomComponent {
         container.sort(o, b);
         table.setContainerDataSource(container);
         table.setColumnCollapsingAllowed(true);
+        table.setColumnCollapsed("created by", true);
         table.setColumnCollapsed("modified by", true);
         table.setColumnCollapsed("path", true);
         table.setColumnCollapsed("isFolder", true);

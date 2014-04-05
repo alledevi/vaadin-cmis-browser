@@ -5,6 +5,7 @@ import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyMatcher;
 import com.github.atave.VaadinCmisBrowser.cmis.api.PropertyType;
 import com.github.atave.VaadinCmisBrowser.cmis.api.QueryOperator;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
+import com.github.atave.VaadinCmisBrowser.vaadin.utils.MimeTypes;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -16,6 +17,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 
@@ -55,6 +57,8 @@ public class SearchView extends VerticalLayout implements View {
     private DateField creationDate;
     private DateField modDate;
     private TextField mod;
+    private ComboBox mimeType;
+    private MimeTypes m;
     private Button searchButton;
 
     // ResultLayout
@@ -75,6 +79,12 @@ public class SearchView extends VerticalLayout implements View {
         setSizeFull();
         setMargin(true);
         addStyleName("search-view");
+//        addStyleName("sidebar");
+        
+        Button homeButton = ((AppUI) UI.getCurrent()).getButtonHome();
+        Button searchButton = ((AppUI) UI.getCurrent()).getButtonSearch(); 
+        searchButton.addStyleName("selected");
+        homeButton.removeStyleName("selected");
 
         client = ((AppUI) UI.getCurrent()).getClient();
 
@@ -178,7 +188,7 @@ public class SearchView extends VerticalLayout implements View {
         advancedLayout.addComponent(creationDate);
         creationDate.setImmediate(true);
         creationDate.setDescription("Enter the creation date of the document to search");
-        creationDate.addValueChangeListener(dateListener);
+        creationDate.addValueChangeListener(dateMimeListener);
         inputFields.add(creationDate);
 
         // DateField modDate
@@ -186,14 +196,26 @@ public class SearchView extends VerticalLayout implements View {
         advancedLayout.addComponent(modDate);
         modDate.setImmediate(true);
         modDate.setDescription("Enter the modified date of the document to search");
-        modDate.addValueChangeListener(dateListener);
+        modDate.addValueChangeListener(dateMimeListener);
         inputFields.add(modDate);
+        
+        // TextField mimeType
+        
+        m = new MimeTypes();
+        mimeType = new ComboBox("MimeType: ");
+        for (String mimeItem: m.getExtensions())
+        	mimeType.addItem(mimeItem);        	
+        advancedLayout.addComponent(mimeType);
+        mimeType.setWidth(Text1Width);
+        mimeType.setImmediate(true);
+        mimeType.setDescription("Enter the MimeType of the document to search");
+        mimeType.addValueChangeListener(dateMimeListener);
+        inputFields.add(mimeType);
 
         // BOTTOMSEARCHLAYOUT: Button searchButton
         bottomSearchLayout = new FormLayout();
         bottomSearchLayout.addStyleName("f2");
-        bottomSearchLayout.setSpacing(true);
-        bottomSearchLayout.setWidth(layoutWidth);
+        bottomSearchLayout.setSizeUndefined();
         middleSearchLayout.addComponent(bottomSearchLayout);
 
         // Button searchButton
@@ -281,7 +303,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * Listener for datefield. Enable/Disable searchButton
      */
-    ValueChangeListener dateListener = new ValueChangeListener() {
+    ValueChangeListener dateMimeListener = new ValueChangeListener() {
 
         private static final long serialVersionUID = 1L;
 
@@ -323,6 +345,9 @@ public class SearchView extends VerticalLayout implements View {
                 if (modDate.getValue() != null)
                     matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.LESS_THAN_OR_EQUALS, PropertyType.DATETIME, modDate.getValue()));
 
+                if (!mimeType.getValue().equals(""))
+                    matchers.add(new PropertyMatcher(PropertyIds.CONTENT_STREAM_MIME_TYPE, QueryOperator.EQUALS, PropertyType.STRING, m.getMimeType(mimeType.getValue().toString())));
+                
                 if (!keyWords.getValue().equals("")) {
                     matchers.add(new AlfrescoClient.TagMatcher(keyWords.getValue().split("\\s+")));
                 }
