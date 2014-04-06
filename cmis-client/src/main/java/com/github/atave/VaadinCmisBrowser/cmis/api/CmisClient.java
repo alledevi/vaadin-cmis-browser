@@ -241,6 +241,15 @@ public abstract class CmisClient implements DocumentFetcher {
     }
 
     /**
+     * @param parentPath the path of the parent
+     * @param fileName   the name of the file
+     * @return the specified file
+     */
+    public FileView getFile(String parentPath, String fileName) {
+        return getFile(joinPath(parentPath, fileName));
+    }
+
+    /**
      * Returns the document at the specified {@code path} or with the specified {@code objectId}.
      */
     @Override
@@ -249,10 +258,28 @@ public abstract class CmisClient implements DocumentFetcher {
     }
 
     /**
+     * @param parentPath the path of the parent
+     * @param fileName   the name of the document
+     * @return the specified document
+     */
+    public DocumentView getDocument(String parentPath, String fileName) {
+        return getDocument(joinPath(parentPath, fileName));
+    }
+
+    /**
      * Returns the folder at the specified {@code path}.
      */
     public FolderView getFolder(String pathOrId) {
         return new FolderView(getBareFolder(pathOrId));
+    }
+
+    /**
+     * @param parentPath the path of the parent
+     * @param fileName   the name of the folder
+     * @return the specified folder
+     */
+    public FolderView getFolder(String parentPath, String fileName) {
+        return getFolder(joinPath(parentPath, fileName));
     }
 
     /**

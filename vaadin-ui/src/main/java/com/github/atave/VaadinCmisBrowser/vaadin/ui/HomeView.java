@@ -1,13 +1,5 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.chemistry.opencmis.commons.enums.VersioningState;
-
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
@@ -27,28 +19,19 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.StartedEvent;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 /**
@@ -491,9 +474,9 @@ public class HomeView extends VerticalLayout implements View {
 						// find tag and populate table
 						if (client.exists(path, event.getFilename())) {
 							try {
-								FileView file = client.getFile(path + event.getFilename());
+								FileView file = client.getFile(path, event.getFilename());
 								if (file.isDocument()) {
-									tags = (ArrayList<String>) client.getTags(client.getDocument(path + event.getFilename()).getId());
+									tags = (ArrayList<String>) client.getTags(client.getDocument(path, event.getFilename()).getId());
 								} 
 							} catch (IOException e1) {
 								e1.printStackTrace();
@@ -567,7 +550,7 @@ public class HomeView extends VerticalLayout implements View {
 
 		public void buttonClick(ClickEvent event) {
 			Boolean exist = false;
-			file = client.getFile(path + fileName.getValue());
+			file = client.getFile(path, fileName.getValue());
 
 			if (!addTagTextField.getValue().equals("")){
 				try {
@@ -591,7 +574,7 @@ public class HomeView extends VerticalLayout implements View {
 						//					file = client.getFile(path + fileName.getValue());
 						// file is a document
 						if (file.isDocument()) {
-							document = client.getDocument(path + fileName.getValue());
+							document = client.getDocument(path, fileName.getValue());
 							id = document.getId();
 						}
 						client.addTags(id, Collections.singleton(addTagTextField.getValue()));
