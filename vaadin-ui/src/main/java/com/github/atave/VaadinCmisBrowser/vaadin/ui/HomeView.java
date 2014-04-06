@@ -215,19 +215,24 @@ public class HomeView extends VerticalLayout implements View {
 
 			window.close();
 
+            String folderName = name.getValue();
+
 			// Add a new folder to table
-			if (name.getValue() != "" && event.getButton() == addFolder) {
+			if (!folderName.isEmpty() && event.getButton() == addFolder) {
 				FolderView newFolder;
 				String path = client.getCurrentFolder().getPath();
-				if (!client.exists(path, name.getValue())) {
+				if (!client.exists(path, folderName)) {
 					newFolder = client.createFolder(path, name.getValue());
 				} else {
-					String regexName = name.getValue();
-					do {
-						regexName = StringUtils.renameFolder(regexName);
-					} while (client.exists(path + regexName));
+                    String modifiedFolderName;
+                    int count = 0;
 
-					newFolder = client.createFolder(path, regexName);
+					do {
+                        ++count;
+                        modifiedFolderName = folderName + " (" + count + ")";
+					} while (client.exists(path, modifiedFolderName));
+
+					newFolder = client.createFolder(path, modifiedFolderName);
 				}
 				table.addItemToTableComponent(newFolder);
 			}
