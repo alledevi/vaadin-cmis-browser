@@ -58,7 +58,6 @@ public class SearchView extends VerticalLayout implements View {
     private DateField modDate;
     private TextField mod;
     private ComboBox mimeType;
-    private MimeTypes m;
     private Button searchButton;
 
     // ResultLayout
@@ -82,8 +81,7 @@ public class SearchView extends VerticalLayout implements View {
 //        addStyleName("sidebar");
         
         Button homeButton = ((AppUI) UI.getCurrent()).getButtonHome();
-        Button searchButton = ((AppUI) UI.getCurrent()).getButtonSearch(); 
-        searchButton.addStyleName("selected");
+        ((AppUI) UI.getCurrent()).getButtonSearch().addStyleName("selected");
         homeButton.removeStyleName("selected");
 
         client = ((AppUI) UI.getCurrent()).getClient();
@@ -200,10 +198,9 @@ public class SearchView extends VerticalLayout implements View {
         inputFields.add(modDate);
         
         // TextField mimeType
-        
-        m = new MimeTypes();
+
         mimeType = new ComboBox("MimeType: ");
-        for (String mimeItem: m.getExtensions())
+        for (String mimeItem: MimeTypes.getExtensions())
         	mimeType.addItem(mimeItem);        	
         advancedLayout.addComponent(mimeType);
         mimeType.setWidth(Text1Width);
@@ -345,8 +342,8 @@ public class SearchView extends VerticalLayout implements View {
                 if (modDate.getValue() != null)
                     matchers.add(new PropertyMatcher(PropertyIds.LAST_MODIFICATION_DATE, QueryOperator.LESS_THAN_OR_EQUALS, PropertyType.DATETIME, modDate.getValue()));
 
-                if (!mimeType.getValue().equals(""))
-                    matchers.add(new PropertyMatcher(PropertyIds.CONTENT_STREAM_MIME_TYPE, QueryOperator.EQUALS, PropertyType.STRING, m.getMimeType(mimeType.getValue().toString())));
+                if (mimeType.getValue() != null)
+                    matchers.add(new PropertyMatcher(PropertyIds.CONTENT_STREAM_MIME_TYPE, QueryOperator.EQUALS, PropertyType.STRING, MimeTypes.getMimeType(mimeType.getValue().toString())));
                 
                 if (!keyWords.getValue().equals("")) {
                     matchers.add(new AlfrescoClient.TagMatcher(keyWords.getValue().split("\\s+")));
