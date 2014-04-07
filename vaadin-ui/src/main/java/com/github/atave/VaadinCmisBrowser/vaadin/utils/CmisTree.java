@@ -3,6 +3,7 @@ package com.github.atave.VaadinCmisBrowser.vaadin.utils;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Tree;
 
 import java.util.ArrayList;

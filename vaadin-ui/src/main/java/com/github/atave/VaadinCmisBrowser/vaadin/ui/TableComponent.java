@@ -21,11 +21,7 @@ import java.util.Collection;
 
 /**
  * Custom table component
- *
- * @param tree   the tree in home view associate with table
- * @param client Alfresco client
  */
-
 public class TableComponent extends CustomComponent {
 
     private static final long serialVersionUID = 1L;
@@ -36,6 +32,12 @@ public class TableComponent extends CustomComponent {
     private final CmisTree tree;
     private final Table table;
 
+    /**
+     * Constructs a {@code TableComponent}.
+     *
+     * @param tree   the tree in home view associated with the table
+     * @param client Alfresco client
+     */
     public TableComponent(AlfrescoClient client, CmisTree tree) {
         this.client = client;
         this.tree = tree;

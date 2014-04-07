@@ -23,15 +23,8 @@ import java.util.Collections;
 
 
 /**
- * Component with all possible user action in table. It is in the last column in TableComponent
- *
- * @param tree     the tree in home view
- * @param path     path of document or folder witch actionComponent refers to
- * @param itemId   table row
- * @param client   Alfresco client
- * @param isFolder true if actionConponent refers to folder, false otherwise
+ * Component with all possible user actions in a table. It is in the last column in TableComponent.
  */
-
 public class TableActionComponent extends CustomComponent {
 
 	private static final long serialVersionUID = 1L;
@@ -62,6 +55,15 @@ public class TableActionComponent extends CustomComponent {
     private Link downloadLink;
 
 
+    /**
+     * Constructs a {@code TableActionComponent}.
+     * @param tree     the tree in home view
+     * @param path     path of the referred file
+     * @param itemId   table row
+     * @param table    the table displaying this component
+     * @param client   Alfresco client
+     * @param isFolder true if this component refers to a folder, false otherwise
+     */
     public TableActionComponent(CmisTree tree, final String path, final Integer itemId, final Table table,
 			final AlfrescoClient client, final Boolean isFolder) {
 		this.tree = tree;

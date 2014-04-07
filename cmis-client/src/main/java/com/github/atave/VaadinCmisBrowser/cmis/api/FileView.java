@@ -142,7 +142,7 @@ public class FileView {
      * Returns the value of the requested property. If the property is not
      * available, <code>null</code> is returned.
      *
-     * @param propertyId
+     * @param propertyId the id of the property
      */
     public <T> T getProperty(String propertyId) {
         return delegate.getPropertyValue(propertyId);

@@ -19,7 +19,7 @@ public class CaseInsensitiveItemSorter extends DefaultItemSorter {
     }
 
     /**
-     * Provides a case-insensitive comparator used for comparing string {@link Property} values.
+     * Provides a case-insensitive comparator used for comparing string {@code Property} values.
      * The <code>CaseInsensitivePropertyValueComparator</code> assumes all objects it
      * compares can be cast to Comparable.
      */
