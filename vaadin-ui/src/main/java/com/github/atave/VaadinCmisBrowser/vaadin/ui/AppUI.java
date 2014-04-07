@@ -94,14 +94,14 @@ public class AppUI extends UI {
     private CssLayout menu;
 
 
-    private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
+    private final HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
         {
             put("/home", HomeView.class);
             put("/search", SearchView.class);
         }
     };
 
-    private HashMap<String, Button> viewNameToMenuButton = new HashMap<String, Button>();
+    private final HashMap<String, Button> viewNameToMenuButton = new HashMap<String, Button>();
 
     protected void init(VaadinRequest request) {
 
@@ -294,7 +294,7 @@ public class AppUI extends UI {
     /**
      * Listener for Button "signin"
      */
-    private ClickListener signinListener = new ClickListener() {
+    private final ClickListener signinListener = new ClickListener() {
 
         private Label error;
         private String password;

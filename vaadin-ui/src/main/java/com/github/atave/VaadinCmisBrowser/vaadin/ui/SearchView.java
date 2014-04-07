@@ -41,30 +41,30 @@ public class SearchView extends VerticalLayout implements View {
     private static final String backImage = "img/back.png";
 
     // AlfrescoClient
-    private AlfrescoClient client;
+    private final AlfrescoClient client;
 
     // SearchLayout
-    private HorizontalLayout topSearchLayout;
-    private VerticalLayout middleSearchLayout;
-    private FormLayout bottomSearchLayout;
-    private Collection<Field> inputFields = new ArrayList<>();
-    private TextField keyWords;
-    private TextField name;
-    private TextField author;
-    private TextArea text;
-    private DateField creationDate;
-    private DateField modDate;
-    private TextField mod;
-    private ComboBox mimeType;
-    private Button searchButton;
+    private final HorizontalLayout topSearchLayout;
+    private final VerticalLayout middleSearchLayout;
+    private final FormLayout bottomSearchLayout;
+    private final Collection<Field> inputFields = new ArrayList<>();
+    private final TextField keyWords;
+    private final TextField name;
+    private final TextField author;
+    private final TextArea text;
+    private final DateField creationDate;
+    private final DateField modDate;
+    private final TextField mod;
+    private final ComboBox mimeType;
+    private final Button searchButton;
 
     // ResultLayout
-    private HorizontalLayout topResultLayout;
-    private HorizontalLayout middleResultLayout;
-    private VerticalLayout bottomResultLayout;
-    private Label numberResults;
-    private TableComponent table;
-    private Button returnButton;
+    private final HorizontalLayout topResultLayout;
+    private final HorizontalLayout middleResultLayout;
+    private final VerticalLayout bottomResultLayout;
+    private final Label numberResults;
+    private final TableComponent table;
+    private final Button returnButton;
 
 
     public SearchView() {
@@ -282,7 +282,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * Listener for texfield and textarea. Enable/Disable searchButton
      */
-    private TextChangeListener textListener = new TextChangeListener() {
+    private final TextChangeListener textListener = new TextChangeListener() {
 
         private static final long serialVersionUID = 1L;
 
@@ -294,7 +294,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * Listener for datefield. Enable/Disable searchButton
      */
-    private ValueChangeListener dateMimeListener = new ValueChangeListener() {
+    private final ValueChangeListener dateMimeListener = new ValueChangeListener() {
 
         private static final long serialVersionUID = 1L;
 
@@ -306,7 +306,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * Listener for searchButton and returnButton.
      */
-    private Button.ClickListener searchListener = new Button.ClickListener() {
+    private final Button.ClickListener searchListener = new Button.ClickListener() {
 
         private static final long serialVersionUID = 1L;
 

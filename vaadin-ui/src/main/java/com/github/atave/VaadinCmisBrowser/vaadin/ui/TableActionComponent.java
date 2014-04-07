@@ -42,12 +42,12 @@ public class TableActionComponent extends CustomComponent {
 	private static final String moreInformationImagePath = "img/info-icon.png";
 	private static final String removeImage = "img/remove.png";
 
-	private CmisTree tree;
-	private String path;
-	private Integer itemId;
-	private Table table;
-	private AlfrescoClient client;
-	private Boolean isFolder;
+	private final CmisTree tree;
+	private final String path;
+	private final Integer itemId;
+	private final Table table;
+	private final AlfrescoClient client;
+	private final Boolean isFolder;
 
     private TextField addTagTextField;
 	private Button addTagButton;
@@ -119,7 +119,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for highlight selected row.
 	 */
-    private ClickListener selectPanelListener = new ClickListener() {
+    private final ClickListener selectPanelListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
@@ -132,7 +132,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for deleteImage. Ask confirm for delete document or folder.
 	 */
-    private ClickListener deleteListener = new ClickListener() {
+    private final ClickListener deleteListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -181,7 +181,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for button in deleteListener.
 	 */
-    private Button.ClickListener deleteButtonListener = new Button.ClickListener() {
+    private final Button.ClickListener deleteButtonListener = new Button.ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		public void buttonClick(ClickEvent event) {
@@ -205,7 +205,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for downloadImage. Starts download of document after select version.
 	 */
-    private ClickListener downloadListener = new ClickListener() {
+    private final ClickListener downloadListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -253,7 +253,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for select version in downloadListener.
 	 */
-    private ValueChangeListener versionListener = new ValueChangeListener() {
+    private final ValueChangeListener versionListener = new ValueChangeListener() {
 		private static final long serialVersionUID = 1L;
 
 		public void valueChange(ValueChangeEvent event) {
@@ -281,7 +281,7 @@ public class TableActionComponent extends CustomComponent {
 	 * Listener for moreInformationImage. Show information about document and folder.
 	 * Show possibility to add tag.
 	 */
-    private ClickListener moreInformationListener = new ClickListener() {
+    private final ClickListener moreInformationListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 
@@ -407,7 +407,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for addTagButton. Add tag to selected document or folder.
 	 */
-    private Button.ClickListener addListener = new Button.ClickListener() {
+    private final Button.ClickListener addListener = new Button.ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 		private FileView file; 
@@ -451,7 +451,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for removeTag. Remove selected tag from tableTag and from repository.
 	 */
-    private ClickListener removeTagListener = new ClickListener() {
+    private final ClickListener removeTagListener = new ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 		private Integer id;

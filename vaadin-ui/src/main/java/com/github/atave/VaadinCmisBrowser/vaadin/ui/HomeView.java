@@ -54,8 +54,8 @@ public class HomeView extends VerticalLayout implements View {
 	// AlfrescoClient 
 	private static AlfrescoClient client;
 
-    private Image addFolderImage;
-	private Image uploadImage;
+    private final Image addFolderImage;
+	private final Image uploadImage;
     private Button addFolder;
 	private Button close;
 	private Window window;
@@ -74,7 +74,7 @@ public class HomeView extends VerticalLayout implements View {
 
 
     private TableComponent table;
-	private CmisTree tree;
+	private final CmisTree tree;
 
     public HomeView() {
 
@@ -179,7 +179,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for filter texfield. returns Documents and Folders filter by "Name"
 	 */
-    private TextChangeListener filterListener = new TextChangeListener() {
+    private final TextChangeListener filterListener = new TextChangeListener() {
 
 		private static final long serialVersionUID = 1L;
 		private SimpleStringFilter filterString = null;
@@ -202,7 +202,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for button in window add folder. Add a new folder or close window.
 	 */
-    private ClickListener addFolderListener = new ClickListener() {
+    private final ClickListener addFolderListener = new ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -240,7 +240,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener upload document and add folder image. Open window dialog.
 	 */
-    private MouseEvents.ClickListener actionListener = new MouseEvents.ClickListener() {
+    private final MouseEvents.ClickListener actionListener = new MouseEvents.ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -543,7 +543,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for addTagButton. Add tag to selected document or folder.
 	 */
-    private Button.ClickListener addListener = new Button.ClickListener() {
+    private final Button.ClickListener addListener = new Button.ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 		private FileView file;
@@ -591,7 +591,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for removeTag. Remove selected tag from tableTag and from repository.
 	 */
-    private MouseEvents.ClickListener removeTagListener = new MouseEvents.ClickListener() {
+    private final MouseEvents.ClickListener removeTagListener = new MouseEvents.ClickListener() {
 
 
 		private static final long serialVersionUID = 1L;
@@ -613,7 +613,7 @@ public class HomeView extends VerticalLayout implements View {
 		}
 	};
 
-	private TextChangeListener nameListener = new TextChangeListener() {
+	private final TextChangeListener nameListener = new TextChangeListener() {
 
 		private static final long serialVersionUID = 1L;
 
