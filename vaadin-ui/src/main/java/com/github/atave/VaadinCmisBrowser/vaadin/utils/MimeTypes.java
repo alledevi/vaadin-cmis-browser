@@ -238,10 +238,10 @@ public final class MimeTypes {
     }
 
     public static Collection<String> getExtensions() {
-    	return Collections.unmodifiableCollection(EXT2MIME.keySet());
+        return Collections.unmodifiableCollection(EXT2MIME.keySet());
     }
-    
+
     public static String getMimeType(String extension) {
-    	return EXT2MIME.get(extension);
+        return EXT2MIME.get(extension);
     }
 }

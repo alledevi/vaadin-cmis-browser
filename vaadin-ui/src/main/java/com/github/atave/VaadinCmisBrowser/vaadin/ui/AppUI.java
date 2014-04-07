@@ -33,7 +33,7 @@ public class AppUI extends UI {
 
     // AlfrescoClient
     private AlfrescoClient client;
-    
+
     private Button buttonHome;
     private Button buttonSearch;
     private Tree tree = new Tree();
@@ -200,39 +200,37 @@ public class AppUI extends UI {
         menu.setHeight("100%");
         menu.removeAllComponents();
         final String viewHome = "home";
-        buttonHome = new NativeButton(viewHome.substring(0, 1).toUpperCase() 
-        		+ viewHome.substring(1).replace('-', ' '));
+        buttonHome = new NativeButton(viewHome.substring(0, 1).toUpperCase()
+                + viewHome.substring(1).replace('-', ' '));
         buttonHome.addStyleName("icon-" + viewHome);
         buttonHome.addClickListener(new ClickListener() {
-        	@Override
-        	public void buttonClick(ClickEvent event) {
-        		clearMenuSelection();
-        		event.getButton().addStyleName("selected");
-        		if (!nav.getState().equals("/" + viewHome))
-        			nav.navigateTo("/" + viewHome);
-        	}
+            @Override
+            public void buttonClick(ClickEvent event) {
+                clearMenuSelection();
+                event.getButton().addStyleName("selected");
+                if (!nav.getState().equals("/" + viewHome))
+                    nav.navigateTo("/" + viewHome);
+            }
         });
         menu.addComponent(buttonHome);
         viewNameToMenuButton.put("/" + viewHome, buttonHome);
-        
+
         final String viewSearch = "search";
-        buttonSearch = new NativeButton(viewSearch.substring(0, 1).toUpperCase() 
-        		+ viewSearch.substring(1).replace('-', ' '));
+        buttonSearch = new NativeButton(viewSearch.substring(0, 1).toUpperCase()
+                + viewSearch.substring(1).replace('-', ' '));
         buttonSearch.addStyleName("icon-" + viewSearch);
         buttonSearch.addClickListener(new ClickListener() {
-        	@Override
-        	public void buttonClick(ClickEvent event) {
-        		clearMenuSelection();
-        		event.getButton().addStyleName("selected");
-        		if (!nav.getState().equals("/" + viewSearch))
-        			nav.navigateTo("/" + viewSearch);
-        	}
+            @Override
+            public void buttonClick(ClickEvent event) {
+                clearMenuSelection();
+                event.getButton().addStyleName("selected");
+                if (!nav.getState().equals("/" + viewSearch))
+                    nav.navigateTo("/" + viewSearch);
+            }
         });
         menu.addComponent(buttonSearch);
         viewNameToMenuButton.put("/" + viewSearch, buttonSearch);
-        
-        
-        
+
 
         String f = Page.getCurrent().getUriFragment();
         if (f != null && f.startsWith("!")) {

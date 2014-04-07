@@ -72,7 +72,7 @@ public class SearchView extends VerticalLayout implements View {
         setMargin(true);
         addStyleName("search-view");
 //        addStyleName("sidebar");
-        
+
         Button homeButton = ((AppUI) UI.getCurrent()).getButtonHome();
         ((AppUI) UI.getCurrent()).getButtonSearch().addStyleName("selected");
         homeButton.removeStyleName("selected");
@@ -189,12 +189,12 @@ public class SearchView extends VerticalLayout implements View {
         modDate.setDescription("Enter the modified date of the document to search");
         modDate.addValueChangeListener(dateMimeListener);
         inputFields.add(modDate);
-        
+
         // TextField mimeType
 
         mimeType = new ComboBox("MimeType: ");
-        for (String mimeItem: MimeTypes.getExtensions())
-        	mimeType.addItem(mimeItem);        	
+        for (String mimeItem : MimeTypes.getExtensions())
+            mimeType.addItem(mimeItem);
         advancedLayout.addComponent(mimeType);
         mimeType.setWidth(Text1Width);
         mimeType.setImmediate(true);
@@ -337,7 +337,7 @@ public class SearchView extends VerticalLayout implements View {
 
                 if (mimeType.getValue() != null)
                     matchers.add(new PropertyMatcher(PropertyIds.CONTENT_STREAM_MIME_TYPE, QueryOperator.EQUALS, PropertyType.STRING, MimeTypes.getMimeType(mimeType.getValue().toString())));
-                
+
                 if (!keyWords.getValue().isEmpty()) {
                     String toParse = keyWords.getValue().trim();
                     Collection<String> tags = new ArrayList<>();
@@ -355,11 +355,11 @@ public class SearchView extends VerticalLayout implements View {
                     for (int i = 0; i < toParse.length(); ++i) {
                         char ch = toParse.charAt(i);
                         if (ch != escape) {
-                            if (separators.contains(toParse.subSequence(i, i+1))) {
+                            if (separators.contains(toParse.subSequence(i, i + 1))) {
                                 // it's a possible separator
                                 if (sb.length() != 0) {
                                     // we are inside a tag
-                                    if (ch == separator && toParse.charAt(i-1) != escape) {
+                                    if (ch == separator && toParse.charAt(i - 1) != escape) {
                                         // the current tag is closed
                                         tags.add(sb.toString());
                                         sb.setLength(0);
@@ -368,7 +368,7 @@ public class SearchView extends VerticalLayout implements View {
                                         // it's part of the current tag
                                         sb.append(ch);
                                     }
-                                } else if (i == 0 || toParse.charAt(i-1) != escape) {
+                                } else if (i == 0 || toParse.charAt(i - 1) != escape) {
                                     // change the separator
                                     separator = ch;
                                 } else {
