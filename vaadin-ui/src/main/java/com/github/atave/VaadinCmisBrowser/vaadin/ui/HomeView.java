@@ -65,7 +65,7 @@ public class HomeView extends VerticalLayout implements View {
 	private HorizontalLayout tagLayout;
 	private TextField addTagTextField;
 	private Button addTagButton;
-	private ArrayList<String> tags = new ArrayList<String>();
+	private ArrayList<String> tags = new ArrayList<>();
 	private Table tableTag;
 	private Integer i = 0;
 	private Image removeTag;

@@ -1,6 +1,5 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import com.github.atave.VaadinCmisBrowser.cmis.api.CmisClient;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -39,38 +38,17 @@ public class AppUI extends UI {
     private Button buttonSearch;
     private Tree tree = new Tree();
 
-    //getter and setter tree
-    public Tree getTree() {
-        return tree;
-    }
-
-    public void setTree(Tree tree) {
-        this.tree = tree;
-    }
-    
     public Button getButtonHome() {
         return buttonHome;
     }
 
-    public void setButtonHome(Button button) {
-        this.buttonHome = button;
-    }
-    
     public Button getButtonSearch() {
         return buttonSearch;
     }
 
-    public void setButtonSearch(Button button) {
-        this.buttonSearch = button;
-    }
-    
 
     public AlfrescoClient getClient() {
         return client;
-    }
-
-    public void setClient(AlfrescoClient client) {
-        this.client = client;
     }
 
     @WebServlet(value = "/*", asyncSupported = true)
@@ -101,7 +79,7 @@ public class AppUI extends UI {
         }
     };
 
-    private final HashMap<String, Button> viewNameToMenuButton = new HashMap<String, Button>();
+    private final HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
 
     protected void init(VaadinRequest request) {
 
@@ -178,7 +156,7 @@ public class AppUI extends UI {
         loginLayout.setComponentAlignment(loginPanel, Alignment.MIDDLE_CENTER);
     }
 
-    private void buildMainView(CmisClient client) {
+    private void buildMainView() {
 
         nav = new Navigator(this, content);
         for (String route : routes.keySet()) {
@@ -305,7 +283,7 @@ public class AppUI extends UI {
                 password = passwordTf.getValue();
                 client = new AlfrescoClient(user, password);
                 signin.removeShortcutListener(enter);
-                buildMainView(client);
+                buildMainView();
             } catch (CmisBaseException e) {
                 if (loginPanel.getComponentCount() > 2) {
                     loginPanel.removeComponent(loginPanel.getComponent(2));

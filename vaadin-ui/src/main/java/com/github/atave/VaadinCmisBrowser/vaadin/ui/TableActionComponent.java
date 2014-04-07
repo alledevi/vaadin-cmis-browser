@@ -51,7 +51,7 @@ public class TableActionComponent extends CustomComponent {
 
     private TextField addTagTextField;
 	private Button addTagButton;
-	private ArrayList<String> tags = new ArrayList<String>();
+	private ArrayList<String> tags = new ArrayList<>();
 	private Table tableTag;
 	private Integer i = 0;
 	private Image removeTag;
