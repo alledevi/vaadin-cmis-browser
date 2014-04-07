@@ -605,7 +605,7 @@ public class HomeView extends VerticalLayout implements View {
 				tag = event.getComponent().getCaption();
 
 				// remove tag from item and table
-				client.deleteTag(tag);
+				client.removeTags(client.getFile(fileName.getValue()).getId(), Collections.singleton(tag));
 				tableTag.removeItem(id);
 			} catch (IOException e) {
 				e.printStackTrace();

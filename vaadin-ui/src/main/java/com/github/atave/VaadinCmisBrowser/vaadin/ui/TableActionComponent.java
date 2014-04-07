@@ -444,8 +444,8 @@ public class TableActionComponent extends CustomComponent {
 						client.addTags(id, Collections.singleton(addTagTextField.getValue())); 
 					} catch (IOException e) { 
 						e.printStackTrace(); 
-					} 
-				} 
+					}
+				}
 			}
 		}
 	};
@@ -466,7 +466,7 @@ public class TableActionComponent extends CustomComponent {
 				tag = event.getComponent().getCaption();
 
 				// remove tag from item and table
-				client.deleteTag(tag);
+				client.removeTags(client.getFile(path).getId(), Collections.singleton(tag));
 				tableTag.removeItem(id);
 			} catch (IOException e) {
 				e.printStackTrace();
