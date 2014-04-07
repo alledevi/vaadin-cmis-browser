@@ -12,10 +12,8 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.impl.json.JSONArray;
 import org.apache.chemistry.opencmis.commons.impl.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.*;
 
 
@@ -55,6 +53,24 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
         return nodeRef.replace("workspace://SpacesStore/", "").replaceFirst(";[^;]+$", "");
     }
 
+    protected static String normalizeTag(String tag, boolean urlEncode) {
+        tag = tag.toLowerCase();
+
+        if (urlEncode) {
+            try {
+                return URLEncoder.encode(tag, "UTF-8").replaceAll("\\+", "%20");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return tag;
+    }
+
+    protected static String normalizeTag(String tag) {
+        return normalizeTag(tag, false);
+    }
+
     private final RestClient restClient;
 
     /**
@@ -87,7 +103,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
     @Override
     public String createTag(String tag) throws IOException {
         JSONObject data = new JSONObject();
-        data.put("name", tag.toLowerCase());
+        data.put("name", normalizeTag(tag));
 
         return restClient.post(
                 TAG_LIST_URL,
@@ -108,10 +124,8 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
 
     @Override
     public boolean deleteTag(String tag) throws IOException {
-        tag = tag.toLowerCase();
-
         return restClient.delete(
-                String.format(TAG_DETAIL_URL, tag),
+                String.format(TAG_DETAIL_URL, normalizeTag(tag, true)),
                 new RestClient.JSONHandler<Boolean, JSONObject>() {
                     @Override
                     public Boolean handleJSON(JSONObject parsedJSON) {
@@ -123,13 +137,11 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
 
     @Override
     public boolean editTag(String tag, String newTag) throws IOException {
-        tag = tag.toLowerCase();
-
         JSONObject data = new JSONObject();
-        data.put("name", newTag.toLowerCase());
+        data.put("name", normalizeTag(newTag));
 
         return restClient.put(
-                String.format(TAG_DETAIL_URL, tag),
+                String.format(TAG_DETAIL_URL, normalizeTag(tag, true)),
                 data,
                 new RestClient.JSONHandler<Boolean, JSONObject>() {
                     @Override
@@ -196,7 +208,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
 
         Map<String, String> tagMap = getAllTags();
         for (String tag : tags) {
-            tagIds.add(tagMap.get(tag.toLowerCase()));
+            tagIds.add(tagMap.get(normalizeTag(tag)));
         }
 
         properties.put(TAGGABLE_ASPECT_ID, tagIds);
@@ -209,7 +221,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
 
         JSONArray data = new JSONArray();
         for (String tag : tags) {
-            data.add(tag.toLowerCase());
+            data.add(normalizeTag(tag));
         }
 
         return restClient.post(
@@ -236,7 +248,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
 
         Collection<String> lowercaseTags = new ArrayList<>();
         for (String tag : tags) {
-            lowercaseTags.add(tag.toLowerCase());
+            lowercaseTags.add(normalizeTag(tag));
         }
 
         Collection<String> currentTags = getTags(objectId);
@@ -247,10 +259,8 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
 
     @Override
     public Collection<String> getObjectIds(String tag) throws IOException {
-        tag = tag.toLowerCase();
-
         return restClient.get(
-                String.format(NODES_FOR_TAG_URL, tag),
+                String.format(NODES_FOR_TAG_URL, normalizeTag(tag, true)),
                 new RestClient.JSONHandler<Collection<String>, JSONArray>() {
                     @Override
                     public Collection<String> handleJSON(JSONArray parsedJSON) {

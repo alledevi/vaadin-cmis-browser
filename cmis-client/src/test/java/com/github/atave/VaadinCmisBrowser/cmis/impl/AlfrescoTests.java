@@ -49,7 +49,7 @@ public class AlfrescoTests {
     private static final String fileName = "___ALFRESCO_DOC.txt";
     private static String filePath = "/" + fileName;
     private static final String[] contents = {"1", "2", "3"};
-    private static final String[] tags = {"tag1", "tag2"};
+    private static final String[] tags = {"tag1", "tag2", "tag with spaces"};
     private static final String createdTag = "derp";
 
     @BeforeClass
