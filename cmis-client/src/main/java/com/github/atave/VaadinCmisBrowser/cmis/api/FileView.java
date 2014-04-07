@@ -3,7 +3,6 @@ package com.github.atave.VaadinCmisBrowser.cmis.api;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.commons.enums.Action;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,13 +33,6 @@ public class FileView {
      */
     public FolderView asFolder() {
         return new FolderView((Folder) delegate);
-    }
-
-    /**
-     * @return whether or not this object supports the specified {@code action}.
-     */
-    public boolean can(Action action) {
-        return delegate.getAllowableActions().getAllowableActions().contains(action);
     }
 
     /**

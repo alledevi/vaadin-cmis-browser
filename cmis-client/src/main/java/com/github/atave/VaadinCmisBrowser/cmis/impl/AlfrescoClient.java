@@ -48,7 +48,6 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
     private static final String THUMBNAIL_DETAIL_URL = THUMBNAIL_LIST_URL + "/%s";
 
     private static final String NODE_REF_KEY = "nodeRef";
-    private static final String THUMBNAIL_KEY = "imgpreview";
 
     private static final String TAGGABLE_ASPECT_ID = "cm:taggable";
 
