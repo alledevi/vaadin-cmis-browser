@@ -1,24 +1,25 @@
 package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-
 import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
+import com.github.atave.VaadinCmisBrowser.vaadin.utils.CmisTree;
 import com.github.atave.VaadinCmisBrowser.vaadin.utils.DocumentDownloader;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.ShortcutListener;
 import com.vaadin.event.MouseEvents.ClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Table.Align;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -41,7 +42,7 @@ public class TableActionComponent extends CustomComponent {
 	private static final String moreInformationImagePath = "img/info-icon.png";
 	private static final String removeImage = "img/remove.png";
 
-	private Tree tree;
+	private CmisTree tree;
 	private String path;
 	private Integer itemId;
 	private Table table;
@@ -70,7 +71,7 @@ public class TableActionComponent extends CustomComponent {
 	private String requestedVersion;
 
 
-	public TableActionComponent(Tree tree, final String path, final Integer itemId, final Table table,
+	public TableActionComponent(CmisTree tree, final String path, final Integer itemId, final Table table,
 			final AlfrescoClient client, final Boolean isFolder) {
 		this.tree = tree;
 		this.table = table;
@@ -194,13 +195,12 @@ public class TableActionComponent extends CustomComponent {
 
 		public void buttonClick(ClickEvent event) {
 			if (event.getButton().equals(yes)) {
-				String parent = "";
-				// Delete all versions of a document
+                // Delete all versions of a document
 				if (isFolder) {
-					FolderView folder = client.getFolder(path);
-					parent = folder.getParent().getName();
-					client.deleteFolder(folder);
-					tree.removeItem(folder.getName());
+                    FolderView folder = client.getFolder(path);
+                    FolderView parent = folder.getParent();
+                    client.deleteFolder(folder);
+                    tree.remove(folder, parent);
 				} else {
 					DocumentView document = client.getDocument(path);
 					client.deleteDocument(document.asDocument());

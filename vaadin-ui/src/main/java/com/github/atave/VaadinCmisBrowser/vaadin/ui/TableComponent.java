@@ -3,6 +3,7 @@ package com.github.atave.VaadinCmisBrowser.vaadin.ui;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
+import com.github.atave.VaadinCmisBrowser.vaadin.utils.CmisTree;
 import com.github.atave.VaadinCmisBrowser.vaadin.utils.Thumbnail;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.IndexedContainer;
@@ -32,14 +33,14 @@ public class TableComponent extends CustomComponent {
     private static final String folderImagePath = "img/folder-icon.png";
 
     private AlfrescoClient client;
-    private Tree tree;
+    private CmisTree tree;
     private Panel panel;
     private VerticalLayout layout;
     private Table table;
     private String path;
     private Image icon;
 
-    public TableComponent(AlfrescoClient client, Tree tree) {
+    public TableComponent(AlfrescoClient client, CmisTree tree) {
         this.client = client;
         this.tree = tree;
 
@@ -136,13 +137,7 @@ public class TableComponent extends CustomComponent {
                 String path = ((String) table.getContainerProperty(itemId, "path").getValue());
                 FileView fileView = client.getFile(path);
                 if (fileView.isFolder()) {
-                    String parentFolder = "";
-                    //there is only one parents
-                    for (FileView f : fileView.getParents()) {
-                        parentFolder = f.getName();
-                    }
-                    HomeView.updateTree(tree, parentFolder);
-                    tree.expandItem(parentFolder);
+                    tree.show(fileView.asFolder());
                     client.navigateTo(path);
                     populateTable(fileView.getPath());
                 }
@@ -162,13 +157,7 @@ public class TableComponent extends CustomComponent {
                 String path = ((String) table.getContainerProperty(itemId, "path").getValue());
                 FileView fileView = client.getFile(path);
                 if (fileView.isFolder()) {
-                    String parentFolder = "";
-                    //there is only one parents
-                    for (FileView f : fileView.getParents()) {
-                        parentFolder = f.getName();
-                    }
-                    HomeView.updateTree(tree, parentFolder);
-                    tree.expandItem(parentFolder);
+                    tree.show(fileView.asFolder());
                     client.navigateTo(path);
                     populateTable(fileView.getPath());
                 }

@@ -26,14 +26,14 @@ public class FileView {
      * Casts itself as a {@link DocumentView}.
      */
     public DocumentView asDocument() {
-        return (DocumentView) this;
+        return new DocumentView((Document) delegate);
     }
 
     /**
      * Casts itself as a {@link FolderView}.
      */
     public FolderView asFolder() {
-        return (FolderView) this;
+        return new FolderView((Folder) delegate);
     }
 
     /**
@@ -148,4 +148,23 @@ public class FileView {
         return delegate.getPropertyValue(propertyId);
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FileView)) return false;
+
+        FileView fileView = (FileView) o;
+
+        return getId().equals(fileView.getId());
+    }
 }

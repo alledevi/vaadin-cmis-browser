@@ -4,14 +4,13 @@ import com.github.atave.VaadinCmisBrowser.cmis.api.DocumentView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FileView;
 import com.github.atave.VaadinCmisBrowser.cmis.api.FolderView;
 import com.github.atave.VaadinCmisBrowser.cmis.impl.AlfrescoClient;
+import com.github.atave.VaadinCmisBrowser.vaadin.utils.CmisTree;
 import com.github.atave.VaadinCmisBrowser.vaadin.utils.DocumentUploader;
-import com.github.atave.VaadinCmisBrowser.vaadin.utils.StringUtils;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutListener;
@@ -29,9 +28,7 @@ import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @SuppressWarnings("deprecation")
 /**
@@ -87,10 +84,9 @@ public class HomeView extends VerticalLayout implements View {
 	// BottomLayout 
 	private HorizontalSplitPanel bottomLayout;
 	private TableComponent table;
-	private Tree tree;
-	private static List<String> treeItemExpanded;
+	private CmisTree tree;
 
-	public HomeView() {
+    public HomeView() {
 
 		setSizeFull();
 		setMargin(true);
@@ -166,13 +162,22 @@ public class HomeView extends VerticalLayout implements View {
 		addComponent(bottomLayout);
 		setExpandRatio(bottomLayout, 3);
 
-		// Tree tree 
-		tree = new Tree();
+		// Tree
+		tree = new CmisTree();
 		tree.setSizeFull();
-		createTree(tree);
-		tree.setSelectable(false);
-		tree.addListener(treeListener);
-		bottomLayout.setFirstComponent(tree);
+        bottomLayout.setFirstComponent(tree);
+
+        tree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                FolderView folder = (FolderView) event.getItemId();
+                table.populateTable(folder.getPath());
+            }
+        });
+
+        // Bootstrap tree
+        tree.add(client.getFolder("/"));
+        tree.show(client.getCurrentFolder());
 
 		// TableComponent table 
 		table = new TableComponent(client, tree);
@@ -233,7 +238,9 @@ public class HomeView extends VerticalLayout implements View {
 					} while (client.exists(path, modifiedFolderName));
 
 					newFolder = client.createFolder(path, modifiedFolderName);
-				}
+                }
+
+                tree.add(newFolder);
 				table.addItemToTableComponent(newFolder);
 			}
 		}
@@ -627,130 +634,6 @@ public class HomeView extends VerticalLayout implements View {
 				addFolder.setEnabled(true);
 		}
 	};
-
-
-	/**
-	 * Listener for tree. Highlight selected item. Populate table from selected item.
-	 */
-	ItemClickListener treeListener = new ItemClickEvent.ItemClickListener() {
-
-		private static final long serialVersionUID = 1L;
-
-		String itemId = null;
-		String path = null;
-
-
-		public void itemClick(ItemClickEvent event) {
-			// Pick only left mouse clicks 
-			itemId = (String) event.getItemId();
-			if (event.getButton() == ItemClickEvent.BUTTON_LEFT) {
-				path = getTreePath(tree, itemId);
-				//update folderComponent + tree 
-				table.populateTable(path);
-				updateTree(tree, itemId);
-			}
-			tree.select(itemId);
-		}
-	};
-
-	/**
-	 * Create tree.
-	 *
-	 * @param tree tree to populate
-	 */
-	public static void createTree(Tree tree) {
-		//add root 
-		treeItemExpanded = new ArrayList<>();
-		tree.addItem("Company Home"); 
-
-		//create hierarchy from current folder 
-		String path = client.getCurrentFolder().getPath();
-		if (path.equals("/")) {
-			tree.select("Company Home");
-			createTree(tree, "Company Home", client.getCurrentFolder());
-			tree.expandItem("Company Home"); 
-			treeItemExpanded.add("Company Home");
-		}
-		ArrayList<FolderView> parents = StringUtils.getAllParentFolder(path, client);
-		for (FolderView parent : parents) {
-			if(parent.getName().equals("RootFolder"))
-				createTree(tree, "Company Home", parent);
-			else
-				createTree(tree, parent.getName(), parent);
-
-		}
-	}
-
-	/**
-	 * Add hierarchy from current folder.
-	 *
-	 * @param tree       tree to populate
-	 * @param parentName name of parent node in the tree
-	 * @param currentFolder current folder to populate
-	 */
-	public static void createTree(Tree tree, String parentName, FolderView currentFolder) {
-		if(tree.getChildren(parentName) != null){
-			if (treeItemExpanded.contains(parentName)) {
-				//if expanded, collapse 
-				tree.collapseItem(parentName);
-				treeItemExpanded.remove(parentName);
-			} else {
-				tree.expandItem(parentName);
-				treeItemExpanded.add(parentName);
-			}
-			return;
-		} else {
-			Collection<FileView> currentFiles = currentFolder.getChildren();
-			for (FileView file : currentFiles) {
-				if (file.isFolder()) {
-					tree.addItem(file.getName());
-					tree.setParent(file.getName(), parentName);
-					if (((FolderView) file).getChildren().isEmpty()) {
-						tree.setChildrenAllowed(file.getName(), false);
-					}
-				}
-				//highlight current folder in tree 
-				tree.select(currentFolder.getName());
-			}
-			if (treeItemExpanded.contains(parentName)) {
-				//if expanded, collapse 
-				tree.collapseItem(parentName);
-				treeItemExpanded.remove(parentName);
-			} else {
-				tree.expandItem(parentName);
-				treeItemExpanded.add(parentName);
-			}
-		}
-	}
-
-	/**
-	 * Update tree from table or from tree listener.
-	 * Tree is already create.
-	 *
-	 * @param tree       tree to populate
-	 * @param parentName name of parent node in the tree
-	 */
-	public static void updateTree(Tree tree, String parentName) {
-		createTree(tree, parentName, client.getCurrentFolder());
-	}
-
-	/**
-	 * Return path of folder selected.
-	 *
-	 * @param tree   tree selected
-	 * @param itemId name of selected node
-	 */
-	public static String getTreePath(Tree tree, String itemId) {
-		if (itemId.equals("Company Home")) {
-			return "/";
-		}
-		String path = "/" + itemId;
-		while (!tree.getParent(itemId).equals("Company Home") && tree.getParent(itemId) != null) {
-			itemId = (String) tree.getParent(itemId);
-			path = "/" + itemId + path;
-		}
-		return path;
-	}
 
 	final ShortcutListener enterFolder = new ShortcutListener("Search", KeyCode.ENTER, null) {
 
