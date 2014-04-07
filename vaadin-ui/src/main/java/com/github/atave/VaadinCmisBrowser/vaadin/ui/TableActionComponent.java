@@ -49,15 +49,7 @@ public class TableActionComponent extends CustomComponent {
 	private AlfrescoClient client;
 	private Boolean isFolder;
 
-	// panel components
-	private Panel panel;
-	private HorizontalLayout layoutFolder;
-	private HorizontalLayout layoutDocument;
-	private Image deleteImage;
-	private Image downloadImage;
-	private Image moreInformationImage;
-	private HorizontalLayout tagLayout;
-	private TextField addTagTextField;
+    private TextField addTagTextField;
 	private Button addTagButton;
 	private ArrayList<String> tags = new ArrayList<String>();
 	private Table tableTag;
@@ -66,12 +58,11 @@ public class TableActionComponent extends CustomComponent {
 
 	//windows components
 	private Window window;
-	private Button yes, no;
-	private Link downloadLink;
-	private String requestedVersion;
+	private Button yes;
+    private Link downloadLink;
 
 
-	public TableActionComponent(CmisTree tree, final String path, final Integer itemId, final Table table,
+    public TableActionComponent(CmisTree tree, final String path, final Integer itemId, final Table table,
 			final AlfrescoClient client, final Boolean isFolder) {
 		this.tree = tree;
 		this.table = table;
@@ -81,25 +72,25 @@ public class TableActionComponent extends CustomComponent {
 		this.path = path;
 
 		// A layout structure used for composition
-		panel = new Panel();
+        Panel panel = new Panel();
 		panel.setData(itemId);
-		layoutFolder = new HorizontalLayout();
-		layoutDocument = new HorizontalLayout();
+        HorizontalLayout layoutFolder = new HorizontalLayout();
+        HorizontalLayout layoutDocument = new HorizontalLayout();
 
 		// button for delete document and folder
-		deleteImage = new Image(null, new ThemeResource(deleteImagePath));
+        Image deleteImage = new Image(null, new ThemeResource(deleteImagePath));
 		deleteImage.setHeight(imageHeight);
 		deleteImage.setWidth(imageWidth);
 		deleteImage.addClickListener(deleteListener);
 
 		// button for download document
-		downloadImage = new Image(null, new ThemeResource(downloadImagePath));
+        Image downloadImage = new Image(null, new ThemeResource(downloadImagePath));
 		downloadImage.setHeight(imageHeight);
 		downloadImage.setWidth(imageWidth);
 		downloadImage.addClickListener(downloadListener);
 
 		// button for get more information about document or folder
-		moreInformationImage = new Image(null, new ThemeResource(moreInformationImagePath));
+        Image moreInformationImage = new Image(null, new ThemeResource(moreInformationImagePath));
 		moreInformationImage.setHeight(imageHeight);
 		moreInformationImage.setWidth(imageWidth);
 		moreInformationImage.addClickListener(moreInformationListener);
@@ -166,7 +157,7 @@ public class TableActionComponent extends CustomComponent {
 
 			yes = new Button("yes");
 			yes.addStyleName("default");
-			no = new Button("no");
+            Button no = new Button("no");
 			no.addStyleName("default");
 			yes.addClickListener(deleteButtonListener);
 			no.addClickListener(deleteButtonListener);
@@ -266,7 +257,7 @@ public class TableActionComponent extends CustomComponent {
 		private static final long serialVersionUID = 1L;
 
 		public void valueChange(ValueChangeEvent event) {
-			requestedVersion = event.getProperty().getValue().toString();
+            String requestedVersion = event.getProperty().getValue().toString();
 
 			if (requestedVersion == "" || requestedVersion == null) {
 				requestedVersion = "1.0";
@@ -340,7 +331,7 @@ public class TableActionComponent extends CustomComponent {
 			// Add a tag component if file is a Docuemnt
 			if(client.getFile(path).isDocument()){
 
-				tagLayout = new HorizontalLayout();
+                HorizontalLayout tagLayout = new HorizontalLayout();
 				tagLayout.setSpacing(true);
 				tagLayout.setWidth("100%");
 				tagLayout.setCaption("Tag: ");

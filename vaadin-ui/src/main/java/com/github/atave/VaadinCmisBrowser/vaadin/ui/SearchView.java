@@ -47,8 +47,6 @@ public class SearchView extends VerticalLayout implements View {
     private HorizontalLayout topSearchLayout;
     private VerticalLayout middleSearchLayout;
     private FormLayout bottomSearchLayout;
-    private Image logoSearch;
-    private Label advancedSearch;
     private Collection<Field> inputFields = new ArrayList<>();
     private TextField keyWords;
     private TextField name;
@@ -64,10 +62,6 @@ public class SearchView extends VerticalLayout implements View {
     private HorizontalLayout topResultLayout;
     private HorizontalLayout middleResultLayout;
     private VerticalLayout bottomResultLayout;
-    private FormLayout tagLayout;
-    private FormLayout advancedLayout;
-    private Image logoResult;
-    private Label resultSearch;
     private Label numberResults;
     private TableComponent table;
     private Button returnButton;
@@ -94,14 +88,14 @@ public class SearchView extends VerticalLayout implements View {
         addComponent(topSearchLayout);
 
         // Image logoSearch
-        logoSearch = new Image(null, new ThemeResource(logoImage));
+        Image logoSearch = new Image(null, new ThemeResource(logoImage));
         logoSearch.setHeight(logoSize);
         logoSearch.setWidth(logoSize);
         topSearchLayout.addComponent(logoSearch);
         topSearchLayout.setComponentAlignment(logoSearch, Alignment.MIDDLE_LEFT);
 
         // Label advancedSearch
-        advancedSearch = new Label("Advanced Search");
+        Label advancedSearch = new Label("Advanced Search");
         advancedSearch.addStyleName("h1");
         advancedSearch.setSizeUndefined();
         topSearchLayout.addComponent(advancedSearch);
@@ -122,7 +116,7 @@ public class SearchView extends VerticalLayout implements View {
         middleSearchLayout.addComponent(l);
 
         // FormLayout tagLayout: TextField keyWords
-        tagLayout = new FormLayout();
+        FormLayout tagLayout = new FormLayout();
         tagLayout.addStyleName("f");
         tagLayout.setSpacing(true);
         middleSearchLayout.addComponent(tagLayout);
@@ -139,7 +133,7 @@ public class SearchView extends VerticalLayout implements View {
                                         TextArea text
 							  		  DateField creationDate, modDate
 		 */
-        advancedLayout = new FormLayout();
+        FormLayout advancedLayout = new FormLayout();
         advancedLayout.addStyleName("f1");
         advancedLayout.setSpacing(true);
         middleSearchLayout.addComponent(advancedLayout);
@@ -233,14 +227,14 @@ public class SearchView extends VerticalLayout implements View {
         addComponent(topResultLayout);
 
         // Image logoResult
-        logoResult = new Image(null, new ThemeResource(logoImage));
+        Image logoResult = new Image(null, new ThemeResource(logoImage));
         logoResult.setHeight(logoSize);
         logoResult.setWidth(logoSize);
         topResultLayout.addComponent(logoResult);
         topResultLayout.setComponentAlignment(logoResult, Alignment.MIDDLE_LEFT);
 
         // Label resultSearch
-        resultSearch = new Label("Advanced Search Results");
+        Label resultSearch = new Label("Advanced Search Results");
         resultSearch.addStyleName("h1");
         resultSearch.setSizeUndefined();
         topResultLayout.addComponent(resultSearch);

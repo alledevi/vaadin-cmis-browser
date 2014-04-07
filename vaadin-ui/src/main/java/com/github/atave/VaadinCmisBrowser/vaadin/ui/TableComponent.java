@@ -34,18 +34,14 @@ public class TableComponent extends CustomComponent {
 
     private AlfrescoClient client;
     private CmisTree tree;
-    private Panel panel;
-    private VerticalLayout layout;
     private Table table;
-    private String path;
-    private Image icon;
 
     public TableComponent(AlfrescoClient client, CmisTree tree) {
         this.client = client;
         this.tree = tree;
 
-        panel = new Panel();
-        layout = new VerticalLayout();
+        Panel panel = new Panel();
+        VerticalLayout layout = new VerticalLayout();
         panel.setContent(layout);
 
         table = new Table();
@@ -85,7 +81,7 @@ public class TableComponent extends CustomComponent {
         table.setColumnExpandRatio("action", 2);
 
         //build table from current folder
-        path = client.getCurrentFolder().getPath();
+        String path = client.getCurrentFolder().getPath();
         populateTable(path);
 
         //hide unused column
@@ -109,6 +105,7 @@ public class TableComponent extends CustomComponent {
      * @param itemId   table row
      */
     public Image getFolderIcon(Boolean isFolder, final String fileId, Integer itemId) {
+        Image icon;
         if (isFolder) {
             icon = new Image("a", new ThemeResource(folderImagePath));
             icon.setData(itemId);

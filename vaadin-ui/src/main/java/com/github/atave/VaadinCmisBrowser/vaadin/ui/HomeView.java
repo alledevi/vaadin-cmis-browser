@@ -54,17 +54,9 @@ public class HomeView extends VerticalLayout implements View {
 	// AlfrescoClient 
 	private static AlfrescoClient client;
 
-	// TopLayout 
-	private HorizontalLayout topLayout;
-	private Image logo;
-	private Label title;
-
-	// MiddleLayout 
-	private HorizontalLayout middleLayout;
-	private Image addFolderImage;
+    private Image addFolderImage;
 	private Image uploadImage;
-	private TextField filter;
-	private Button addFolder;
+    private Button addFolder;
 	private Button close;
 	private Window window;
 	private TextField name;
@@ -81,9 +73,7 @@ public class HomeView extends VerticalLayout implements View {
 	private String path;
 
 
-	// BottomLayout 
-	private HorizontalSplitPanel bottomLayout;
-	private TableComponent table;
+    private TableComponent table;
 	private CmisTree tree;
 
     public HomeView() {
@@ -100,21 +90,21 @@ public class HomeView extends VerticalLayout implements View {
 		client = ((AppUI) UI.getCurrent()).getClient();
 
 		// TOPLAYOUT: Image logo + Label title 
-		topLayout = new HorizontalLayout();
+        HorizontalLayout topLayout = new HorizontalLayout();
 		topLayout.addStyleName("toolbar");
 		topLayout.setWidth(layoutWidth);
 		topLayout.setSpacing(true);
 		addComponent(topLayout);
 
 		// Image logo 
-		logo = new Image(null, new ThemeResource(logoImagePath));
+        Image logo = new Image(null, new ThemeResource(logoImagePath));
 		logo.setHeight(logoSize);
 		logo.setWidth(logoSize);
 		topLayout.addComponent(logo);
 		topLayout.setComponentAlignment(logo, Alignment.TOP_LEFT);
 
 		// Label title 
-		title = new Label("My Alfresco");
+        Label title = new Label("My Alfresco");
 		title.addStyleName("h1");
 		title.setSizeUndefined();
 		topLayout.addComponent(title);
@@ -122,7 +112,7 @@ public class HomeView extends VerticalLayout implements View {
 		topLayout.setExpandRatio(title, 1);
 
 		// MIDDLELAYOUT: Image addFolderImage + Image uploadImage + TextField filter  
-		middleLayout = new HorizontalLayout();
+        HorizontalLayout middleLayout = new HorizontalLayout();
 		middleLayout.addStyleName("toolbar");
 		middleLayout.setSpacing(true);
 		middleLayout.setSizeUndefined();
@@ -146,7 +136,7 @@ public class HomeView extends VerticalLayout implements View {
 		middleLayout.setComponentAlignment(uploadImage, Alignment.MIDDLE_RIGHT);
 
 		// TextField SearchBar  
-		filter = new TextField();
+        TextField filter = new TextField();
 		filter.setWidth(filterWidth);
 		filter.focus();
 		filter.setInputPrompt("Filter");
@@ -155,7 +145,7 @@ public class HomeView extends VerticalLayout implements View {
 		middleLayout.setComponentAlignment(filter, Alignment.MIDDLE_RIGHT);
 
 		// BOTTOMLAYOUT: Tree tree + TableComponent table  
-		bottomLayout = new HorizontalSplitPanel();
+        HorizontalSplitPanel bottomLayout = new HorizontalSplitPanel();
 		bottomLayout.setStyleName("toolbar");
 		bottomLayout.setSizeFull();
 		bottomLayout.setSplitPosition(15, Sizeable.UNITS_PERCENTAGE);

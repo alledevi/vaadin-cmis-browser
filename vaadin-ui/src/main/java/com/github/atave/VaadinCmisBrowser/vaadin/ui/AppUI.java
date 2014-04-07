@@ -81,16 +81,9 @@ public class AppUI extends UI {
     private CssLayout root;
     private CssLayout content;
 
-    // init
-    private Label bg;
-
     // buildLoginView
     private VerticalLayout loginLayout;
     private CssLayout loginPanel;
-    private HorizontalLayout labels;
-    private Label welcome;
-    private Label title;
-    private HorizontalLayout fields;
     private TextField usernameTf;
     private PasswordField passwordTf;
     private Button signin;
@@ -98,15 +91,7 @@ public class AppUI extends UI {
     //buildMainView
     private Navigator nav;
     private String user;
-    private HorizontalLayout hl;
-    private VerticalLayout menuLayout;
-    private CssLayout brandingLayout;
-    private Label logo;
     private CssLayout menu;
-    private VerticalLayout userMenu;
-    private Image profilePic;
-    private Label userName;
-    private Button exit;
 
 
     HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
@@ -127,7 +112,7 @@ public class AppUI extends UI {
         root.setSizeFull();
         setContent(root);
 
-        bg = new Label();
+        Label bg = new Label();
         bg.setSizeUndefined();
         bg.addStyleName("login-bg");
         root.addComponent(bg);
@@ -149,26 +134,26 @@ public class AppUI extends UI {
         loginPanel = new CssLayout();
         loginPanel.addStyleName("login-panel");
 
-        labels = new HorizontalLayout();
+        HorizontalLayout labels = new HorizontalLayout();
         labels.setWidth("100%");
         labels.setMargin(true);
         labels.addStyleName("labels");
         loginPanel.addComponent(labels);
 
-        welcome = new Label("Welcome");
+        Label welcome = new Label("Welcome");
         welcome.setSizeUndefined();
         welcome.addStyleName("h4");
         labels.addComponent(welcome);
         labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
 
-        title = new Label("My Alfresco");
+        Label title = new Label("My Alfresco");
         title.setSizeUndefined();
         title.addStyleName("h2");
         title.addStyleName("light");
         labels.addComponent(title);
         labels.setComponentAlignment(title, Alignment.MIDDLE_RIGHT);
 
-        fields = new HorizontalLayout();
+        HorizontalLayout fields = new HorizontalLayout();
         fields.setSpacing(true);
         fields.setMargin(true);
         fields.addStyleName("fields");
@@ -204,23 +189,23 @@ public class AppUI extends UI {
         root.removeComponent(loginLayout);
 
         //brandingLayout
-        brandingLayout = new CssLayout();
+        CssLayout brandingLayout = new CssLayout();
         brandingLayout.addStyleName("branding");
-        logo = new Label("<span>My</span>Alfresco", ContentMode.HTML);
+        Label logo = new Label("<span>My</span>Alfresco", ContentMode.HTML);
         logo.setSizeUndefined();
         brandingLayout.addComponent(logo);
 
         // userMenu
-        userMenu = new VerticalLayout();
+        VerticalLayout userMenu = new VerticalLayout();
         userMenu.setSizeUndefined();
         userMenu.addStyleName("user");
-        profilePic = new Image(null, new ThemeResource("img/profile-pic.png"));
+        Image profilePic = new Image(null, new ThemeResource("img/profile-pic.png"));
         profilePic.setWidth("34px");
         userMenu.addComponent(profilePic);
-        userName = new Label(user);
+        Label userName = new Label(user);
         userName.setSizeUndefined();
         userMenu.addComponent(userName);
-        exit = new NativeButton("Exit");
+        Button exit = new NativeButton("Exit");
         exit.addStyleName("icon-cancel");
         exit.setDescription("Sign Out");
         userMenu.addComponent(exit);
@@ -284,7 +269,7 @@ public class AppUI extends UI {
         }
 
         // menuLayout
-        menuLayout = new VerticalLayout();
+        VerticalLayout menuLayout = new VerticalLayout();
         menuLayout.addStyleName("sidebar");
         menuLayout.setWidth(null);
         menuLayout.setHeight("100%");
@@ -294,7 +279,7 @@ public class AppUI extends UI {
         menuLayout.addComponent(userMenu);
 
         // hl
-        hl = new HorizontalLayout();
+        HorizontalLayout hl = new HorizontalLayout();
         hl.setSizeFull();
         hl.addStyleName("main-view");
         hl.addComponent(menuLayout);
