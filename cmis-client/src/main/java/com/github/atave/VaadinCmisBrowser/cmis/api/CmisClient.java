@@ -339,6 +339,7 @@ public abstract class CmisClient implements DocumentFetcher {
         try {
             if (exists(documentPath)) {
                 // Create new version of an existing document
+                properties.remove(PropertyIds.NAME);
                 document = checkout(documentPath);
                 document.checkIn(versioningState == VersioningState.MAJOR, properties, contentStream, checkInComment);
                 document = getBareDocument(documentPath);
