@@ -179,7 +179,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for filter texfield. returns Documents and Folders filter by "Name"
 	 */
-	TextChangeListener filterListener = new TextChangeListener() {
+    private TextChangeListener filterListener = new TextChangeListener() {
 
 		private static final long serialVersionUID = 1L;
 		private SimpleStringFilter filterString = null;
@@ -202,7 +202,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for button in window add folder. Add a new folder or close window.
 	 */
-	ClickListener addFolderListener = new ClickListener() {
+    private ClickListener addFolderListener = new ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -240,7 +240,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener upload document and add folder image. Open window dialog.
 	 */
-	MouseEvents.ClickListener actionListener = new MouseEvents.ClickListener() {
+    private MouseEvents.ClickListener actionListener = new MouseEvents.ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -543,7 +543,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for addTagButton. Add tag to selected document or folder.
 	 */
-	Button.ClickListener addListener = new Button.ClickListener() {
+    private Button.ClickListener addListener = new Button.ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 		private FileView file;
@@ -591,7 +591,7 @@ public class HomeView extends VerticalLayout implements View {
 	/**
 	 * Listener for removeTag. Remove selected tag from tableTag and from repository.
 	 */
-	MouseEvents.ClickListener removeTagListener = new MouseEvents.ClickListener() {
+    private MouseEvents.ClickListener removeTagListener = new MouseEvents.ClickListener() {
 
 
 		private static final long serialVersionUID = 1L;
@@ -613,7 +613,7 @@ public class HomeView extends VerticalLayout implements View {
 		}
 	};
 
-	TextChangeListener nameListener = new TextChangeListener() {
+	private TextChangeListener nameListener = new TextChangeListener() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -625,7 +625,7 @@ public class HomeView extends VerticalLayout implements View {
 		}
 	};
 
-	final ShortcutListener enterFolder = new ShortcutListener("Search", KeyCode.ENTER, null) {
+	private final ShortcutListener enterFolder = new ShortcutListener("Search", KeyCode.ENTER, null) {
 
 		private static final long serialVersionUID = 1L;
 
@@ -637,7 +637,7 @@ public class HomeView extends VerticalLayout implements View {
 	};
 
 	// shortcutListener enter: shortcut for add tag
-	final ShortcutListener enterTag = new ShortcutListener("", KeyCode.ENTER, null) {
+	private final ShortcutListener enterTag = new ShortcutListener("", KeyCode.ENTER, null) {
 		private static final long serialVersionUID = 1L;
 
 		@Override

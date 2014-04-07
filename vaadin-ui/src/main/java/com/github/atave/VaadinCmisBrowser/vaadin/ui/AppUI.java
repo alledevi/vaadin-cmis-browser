@@ -35,8 +35,8 @@ public class AppUI extends UI {
     // AlfrescoClient
     private AlfrescoClient client;
     
-    Button buttonHome;
-    Button buttonSearch;
+    private Button buttonHome;
+    private Button buttonSearch;
     private Tree tree = new Tree();
 
     //getter and setter tree
@@ -94,14 +94,14 @@ public class AppUI extends UI {
     private CssLayout menu;
 
 
-    HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
+    private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
         {
             put("/home", HomeView.class);
             put("/search", SearchView.class);
         }
     };
 
-    HashMap<String, Button> viewNameToMenuButton = new HashMap<String, Button>();
+    private HashMap<String, Button> viewNameToMenuButton = new HashMap<String, Button>();
 
     protected void init(VaadinRequest request) {
 
@@ -294,7 +294,7 @@ public class AppUI extends UI {
     /**
      * Listener for Button "signin"
      */
-    ClickListener signinListener = new ClickListener() {
+    private ClickListener signinListener = new ClickListener() {
 
         private Label error;
         private String password;
@@ -339,7 +339,7 @@ public class AppUI extends UI {
     /**
      * ShortcutListener enter for Button "signin"
      */
-    final ShortcutListener enter = new ShortcutListener("Sign In", KeyCode.ENTER, null) {
+    private final ShortcutListener enter = new ShortcutListener("Sign In", KeyCode.ENTER, null) {
         @Override
         public void handleAction(Object sender, Object target) {
             signin.click();

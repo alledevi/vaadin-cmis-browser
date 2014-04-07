@@ -119,7 +119,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for highlight selected row.
 	 */
-	ClickListener selectPanelListener = new ClickListener() {
+    private ClickListener selectPanelListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
@@ -132,7 +132,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for deleteImage. Ask confirm for delete document or folder.
 	 */
-	ClickListener deleteListener = new ClickListener() {
+    private ClickListener deleteListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -181,7 +181,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for button in deleteListener.
 	 */
-	Button.ClickListener deleteButtonListener = new Button.ClickListener() {
+    private Button.ClickListener deleteButtonListener = new Button.ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		public void buttonClick(ClickEvent event) {
@@ -205,7 +205,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for downloadImage. Starts download of document after select version.
 	 */
-	ClickListener downloadListener = new ClickListener() {
+    private ClickListener downloadListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -253,7 +253,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for select version in downloadListener.
 	 */
-	ValueChangeListener versionListener = new ValueChangeListener() {
+    private ValueChangeListener versionListener = new ValueChangeListener() {
 		private static final long serialVersionUID = 1L;
 
 		public void valueChange(ValueChangeEvent event) {
@@ -281,7 +281,7 @@ public class TableActionComponent extends CustomComponent {
 	 * Listener for moreInformationImage. Show information about document and folder.
 	 * Show possibility to add tag.
 	 */
-	ClickListener moreInformationListener = new ClickListener() {
+    private ClickListener moreInformationListener = new ClickListener() {
 		private static final long serialVersionUID = 1L;
 
 
@@ -407,7 +407,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for addTagButton. Add tag to selected document or folder.
 	 */
-	Button.ClickListener addListener = new Button.ClickListener() {
+    private Button.ClickListener addListener = new Button.ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 		private FileView file; 
@@ -451,7 +451,7 @@ public class TableActionComponent extends CustomComponent {
 	/**
 	 * Listener for removeTag. Remove selected tag from tableTag and from repository.
 	 */
-	ClickListener removeTagListener = new ClickListener() {
+    private ClickListener removeTagListener = new ClickListener() {
 
 		private static final long serialVersionUID = 1L;
 		private Integer id;
@@ -473,7 +473,7 @@ public class TableActionComponent extends CustomComponent {
 	};
 
 	// shortcutListener enter: shortcut for add tag
-	final ShortcutListener enterTag = new ShortcutListener("", KeyCode.ENTER, null) {
+	private final ShortcutListener enterTag = new ShortcutListener("", KeyCode.ENTER, null) {
 		private static final long serialVersionUID = 1L;
 
 		@Override

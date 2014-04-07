@@ -282,7 +282,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * Listener for texfield and textarea. Enable/Disable searchButton
      */
-    TextChangeListener textListener = new TextChangeListener() {
+    private TextChangeListener textListener = new TextChangeListener() {
 
         private static final long serialVersionUID = 1L;
 
@@ -294,7 +294,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * Listener for datefield. Enable/Disable searchButton
      */
-    ValueChangeListener dateMimeListener = new ValueChangeListener() {
+    private ValueChangeListener dateMimeListener = new ValueChangeListener() {
 
         private static final long serialVersionUID = 1L;
 
@@ -306,7 +306,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * Listener for searchButton and returnButton.
      */
-    Button.ClickListener searchListener = new Button.ClickListener() {
+    private Button.ClickListener searchListener = new Button.ClickListener() {
 
         private static final long serialVersionUID = 1L;
 
@@ -381,7 +381,7 @@ public class SearchView extends VerticalLayout implements View {
     /**
      * ShortcutListener enter for middleSearchLayout
      */
-    final ShortcutListener enter = new ShortcutListener("Search", KeyCode.ENTER, null) {
+    private final ShortcutListener enter = new ShortcutListener("Search", KeyCode.ENTER, null) {
 
         private static final long serialVersionUID = 1L;
 

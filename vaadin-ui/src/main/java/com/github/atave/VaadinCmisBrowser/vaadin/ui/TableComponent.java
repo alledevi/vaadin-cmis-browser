@@ -122,7 +122,7 @@ public class TableComponent extends CustomComponent {
     /**
      * Listener for icon. Highlight selected row. If double click on a folder, open it.
      */
-    MouseEvents.ClickListener iconListener = new MouseEvents.ClickListener() {
+    private MouseEvents.ClickListener iconListener = new MouseEvents.ClickListener() {
         private static final long serialVersionUID = 1L;
 
         public void click(com.vaadin.event.MouseEvents.ClickEvent event) {
@@ -145,7 +145,7 @@ public class TableComponent extends CustomComponent {
     /**
      * Listener for row. If double click on a folder, open it.
      */
-    ItemClickListener itemListener = new ItemClickListener() {
+    private ItemClickListener itemListener = new ItemClickListener() {
         private static final long serialVersionUID = 1L;
 
         public void itemClick(ItemClickEvent event) {
