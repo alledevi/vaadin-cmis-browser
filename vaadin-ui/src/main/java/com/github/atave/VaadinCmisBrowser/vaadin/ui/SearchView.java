@@ -17,7 +17,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 
@@ -339,8 +338,55 @@ public class SearchView extends VerticalLayout implements View {
                 if (mimeType.getValue() != null)
                     matchers.add(new PropertyMatcher(PropertyIds.CONTENT_STREAM_MIME_TYPE, QueryOperator.EQUALS, PropertyType.STRING, MimeTypes.getMimeType(mimeType.getValue().toString())));
                 
-                if (!keyWords.getValue().equals("")) {
-                    matchers.add(new AlfrescoClient.TagMatcher(keyWords.getValue().split("\\s+")));
+                if (!keyWords.getValue().isEmpty()) {
+                    String toParse = keyWords.getValue().trim();
+                    Collection<String> tags = new ArrayList<>();
+
+                    StringBuilder sb = new StringBuilder();
+
+                    final char space = ' ';
+                    final char single_quote = '\'';
+                    final char double_quote = '"';
+                    final char escape = '\\';
+
+                    char separator = space;
+                    final String separators = "" + single_quote + space + double_quote;
+
+                    for (int i = 0; i < toParse.length(); ++i) {
+                        char ch = toParse.charAt(i);
+                        if (ch != escape) {
+                            if (separators.contains(toParse.subSequence(i, i+1))) {
+                                // it's a possible separator
+                                if (sb.length() != 0) {
+                                    // we are inside a tag
+                                    if (ch == separator && toParse.charAt(i-1) != escape) {
+                                        // the current tag is closed
+                                        tags.add(sb.toString());
+                                        sb.setLength(0);
+                                        separator = space;
+                                    } else {
+                                        // it's part of the current tag
+                                        sb.append(ch);
+                                    }
+                                } else if (i == 0 || toParse.charAt(i-1) != escape) {
+                                    // change the separator
+                                    separator = ch;
+                                } else {
+                                    // escaped separator is part of a new tag
+                                    sb.append(ch);
+                                }
+                            } else {
+                                // it's part of the current tag
+                                sb.append(ch);
+                            }
+                        }
+                    }
+
+                    if (sb.length() > 0) {
+                        tags.add(sb.toString());
+                    }
+
+                    matchers.add(new AlfrescoClient.TagMatcher(tags));
                 }
 
                 table.clearTable();
