@@ -50,7 +50,7 @@ public class AlfrescoClient extends HttpAuthCmisClient implements Tagger, Thumbn
     private static final String NODE_REF_KEY = "nodeRef";
     private static final String THUMBNAIL_KEY = "imgpreview";
 
-    public static final String TAGGABLE_ASPECT_ID = "cm:taggable";
+    private static final String TAGGABLE_ASPECT_ID = "cm:taggable";
 
     protected static String normalizeNodeRef(String nodeRef) {
         return nodeRef.replace("workspace://SpacesStore/", "").replaceFirst(";[^;]+$", "");

@@ -18,7 +18,7 @@ public class Config {
 
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
 
-    static final Properties properties = new Properties();
+    private static final Properties properties = new Properties();
 
     private static InputStream getResource(String name) {
         return Config.class.getResourceAsStream(name);

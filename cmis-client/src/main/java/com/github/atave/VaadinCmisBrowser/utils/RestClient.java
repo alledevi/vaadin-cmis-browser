@@ -34,12 +34,12 @@ import java.util.Map;
  */
 public class RestClient {
 
-    public static final String GET = "GET";
-    public static final String POST = "POST";
-    public static final String PUT = "PUT";
-    public static final String DELETE = "DELETE";
+    private static final String GET = "GET";
+    private static final String POST = "POST";
+    private static final String PUT = "PUT";
+    private static final String DELETE = "DELETE";
 
-    public static final Map<String, Class<?>> methodsMap = new HashMap<>();
+    private static final Map<String, Class<?>> methodsMap = new HashMap<>();
 
     static {
         methodsMap.put(GET, HttpGet.class);
