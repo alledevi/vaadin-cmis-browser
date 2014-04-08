@@ -16,7 +16,6 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
-
 import javax.servlet.annotation.WebServlet;
 import java.util.HashMap;
 import java.util.Iterator;

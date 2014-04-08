@@ -35,9 +35,9 @@ public class SearchView extends VerticalLayout implements View {
     private static final String formWidth = "70%";
     private static final String Text2Width = "90%";
     private static final String logoSize = "45px";
-    private static final String searchImage = "img/search36.png";
+    private static final String searchImage = "img/search-icon.png";
     private static final String logoImage = "img/alfresco.png";
-    private static final String backImage = "img/back.png";
+    private static final String backImage = "img/return-icon.png";
 
     // AlfrescoClient
     private final AlfrescoClient client;

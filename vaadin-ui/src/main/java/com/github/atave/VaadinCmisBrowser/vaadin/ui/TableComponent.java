@@ -25,7 +25,7 @@ import java.util.Collection;
 public class TableComponent extends CustomComponent {
 
     private static final long serialVersionUID = 1L;
-    private static final String imageWidth = "34px";
+    private static final String imageSize = "34px";
     private static final String folderImagePath = "img/folder-icon.png";
 
     private final AlfrescoClient client;
@@ -111,11 +111,11 @@ public class TableComponent extends CustomComponent {
         if (isFolder) {
             icon = new Image("a", new ThemeResource(folderImagePath));
             icon.setData(itemId);
-            icon.setWidth(imageWidth);
+            icon.setWidth(imageSize);
         } else {
             icon = new Thumbnail(client, fileId);
             icon.setData(itemId);
-            icon.setWidth(imageWidth);
+            icon.setWidth(imageSize);
         }
         icon.addClickListener(iconListener);
         return icon;

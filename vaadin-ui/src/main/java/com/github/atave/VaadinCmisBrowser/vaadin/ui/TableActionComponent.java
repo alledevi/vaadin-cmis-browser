@@ -16,7 +16,6 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Table.Align;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -483,5 +482,4 @@ public class TableActionComponent extends CustomComponent {
             addTagButton.click();
         }
     };
-
 }
